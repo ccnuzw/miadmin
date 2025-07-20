@@ -1,9 +1,0 @@
-{
-  "/(main)/roles/new/page": "app/(main)/roles/new/page.js",
-  "/(main)/page": "app/(main)/page.js",
-  "/(main)/users/page": "app/(main)/users/page.js",
-  "/(main)/roles/page": "app/(main)/roles/page.js",
-  "/(main)/permissions/page": "app/(main)/permissions/page.js",
-  "/(main)/users/new/page": "app/(main)/users/new/page.js",
-  "/(main)/settings/page": "app/(main)/settings/page.js"
-}
