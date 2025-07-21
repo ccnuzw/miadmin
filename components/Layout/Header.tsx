@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
     {
       key: '1',
       label: (
-        <a target="_blank" rel="noopener noreferrer" href="#">
+        <a href="/settings">
           个人设置
         </a>
       ),
@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
     {
       key: '2',
       label: (
-        <a target="_blank" rel="noopener noreferrer" href="#">
+        <a href="/settings">
           修改密码
         </a>
       ),
@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
     {
       key: '3',
       label: (
-        <a target="_blank" rel="noopener noreferrer" href="#">
+        <a href="/login">
           退出登录
         </a>
       ),
@@ -68,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
             <a onClick={(e) => e.preventDefault()}>
               <Space>
                 <Avatar icon={<UserOutlined />} />
-                <span>Admin</span>
+                <span>管理员</span>
                 <DownOutlined />
               </Space>
             </a>
