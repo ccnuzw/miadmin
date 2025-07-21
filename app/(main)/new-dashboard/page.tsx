@@ -205,14 +205,16 @@ const NewDashboardPage: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} md={12}>
           <Card title="最新活动">
-            <Timeline>
-              {recentActivities.map(activity => (
-                <Timeline.Item key={activity.id}>
-                  <p>{activity.user} {activity.action}</p>
-                  <p style={{ fontSize: '12px', color: '#999' }}>{activity.time}</p>
-                </Timeline.Item>
-              ))}
-            </Timeline>
+            <Timeline
+              items={recentActivities.map(activity => ({
+                children: (
+                  <>
+                    <p>{activity.user} {activity.action}</p>
+                    <p style={{ fontSize: '12px', color: '#999' }}>{activity.time}</p>
+                  </>
+                ),
+              }))}
+            />
           </Card>
         </Col>
         <Col xs={24} md={12}>
