@@ -82,30 +82,34 @@ const LogsPage: React.FC = () => {
       key: 'operationLogs',
       label: '操作日志',
       children: (
-        <Space style={{ marginBottom: 16 }}>
-          <Search
-            placeholder="搜索操作人、模块、内容或IP"
-            onSearch={handleOperationSearch}
-            style={{ width: 300 }}
-            allowClear
-          />
+        <>
+          <div style={{ marginBottom: 16 }}>
+            <Search
+              placeholder="搜索操作人、模块、内容或IP"
+              onSearch={handleOperationSearch}
+              style={{ width: 300 }}
+              allowClear
+            />
+          </div>
           <Table columns={operationColumns} dataSource={operationLogs} rowKey="id" pagination={{ pageSize: 10 }} scroll={{ x: 'max-content' }} />
-        </Space>
+        </>
       ),
     },
     {
       key: 'loginLogs',
       label: '登录日志',
       children: (
-        <Space style={{ marginBottom: 16 }}>
-          <Search
-            placeholder="搜索用户名或IP"
-            onSearch={handleLoginSearch}
-            style={{ width: 300 }}
-            allowClear
-          />
+        <>
+          <div style={{ marginBottom: 16 }}>
+            <Search
+              placeholder="搜索用户名或IP"
+              onSearch={handleLoginSearch}
+              style={{ width: 300 }}
+              allowClear
+            />
+          </div>
           <Table columns={loginColumns} dataSource={loginLogs} rowKey="id" pagination={{ pageSize: 10 }} scroll={{ x: 'max-content' }} />
-        </Space>
+        </>
       ),
     },
   ];
