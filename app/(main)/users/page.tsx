@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Table, Button, Input, Space, Modal, Switch, Tag, Select, message, App } from 'antd';
+import { Table, Button, Input, Space, Modal, Switch, Tag, Select, message, App, Row } from 'antd';
 import { EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 import Link from 'next/link';
@@ -32,6 +32,13 @@ const UsersPage: React.FC = () => {
   const [searchText, setSearchText] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<boolean | undefined>(undefined);
   const [filterRole, setFilterRole] = useState<string | undefined>(undefined);
+
+  const handleResetFilters = () => {
+    setSearchText('');
+    setFilterStatus(undefined);
+    setFilterRole(undefined);
+    filterUsers('', undefined, undefined);
+  };
 
   const handleSearch = (value: string) => {
     setSearchText(value);
@@ -194,39 +201,47 @@ const UsersPage: React.FC = () => {
   return (
     <div>
       <h1>用户列表</h1>
-      <Space style={{ marginBottom: 16 }}>
-        <Search
-          placeholder="搜索用户名、邮箱或手机号"
-          onSearch={handleSearch}
-          style={{ width: 250 }}
-          allowClear
-        />
-        <Select
-          placeholder="筛选状态"
-          allowClear
-          style={{ width: 120 }}
-          onChange={handleStatusChange}
-          options={[
-            { value: true, label: '启用' },
-            { value: false, label: '禁用' },
-          ]}
-        />
-        <Select
-          placeholder="筛选角色"
-          allowClear
-          style={{ width: 120 }}
-          onChange={handleRoleChange}
-          options={[
-            { value: '管理员', label: '管理员' },
-            { value: '编辑', label: '编辑' },
-            { value: '普通用户', label: '普通用户' },
-            { value: '访客', label: '访客' },
-          ]}
-        />
-        <Link href="/users/new">
-          <Button type="primary" icon={<PlusOutlined />}>新增用户</Button>
-        </Link>
-      </Space>
+      <Row justify="space-between" style={{ marginBottom: 16 }}>
+        <Space>
+          <Search
+            placeholder="搜索用户名、邮箱或手机号"
+            onSearch={handleSearch}
+            style={{ width: 250 }}
+            allowClear
+            value={searchText}
+          />
+          <Select
+            placeholder="筛选状态"
+            allowClear
+            style={{ width: 120 }}
+            onChange={handleStatusChange}
+            value={filterStatus}
+            options={[
+              { value: true, label: '启用' },
+              { value: false, label: '禁用' },
+            ]}
+          />
+          <Select
+            placeholder="筛选角色"
+            allowClear
+            style={{ width: 120 }}
+            onChange={handleRoleChange}
+            value={filterRole}
+            options={[
+              { value: '管理员', label: '管理员' },
+              { value: '编辑', label: '编辑' },
+              { value: '普通用户', label: '普通用户' },
+              { value: '访客', label: '访客' },
+            ]}
+          />
+          <Button onClick={handleResetFilters}>重置</Button>
+        </Space>
+        <Space>
+          <Link href="/users/new">
+            <Button type="primary" icon={<PlusOutlined />}>新增用户</Button>
+          </Link>
+        </Space>
+      </Row>
       <Table columns={columns} dataSource={users} rowKey="id" pagination={{ pageSize: 10 }} />
     </div>
   );

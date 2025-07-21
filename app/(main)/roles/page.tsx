@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Table, Button, Input, Space, Modal, message, App } from 'antd';
+import { Table, Button, Input, Space, Modal, message, App, Row } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 import Link from 'next/link';
@@ -22,8 +22,17 @@ const RolesPage: React.FC = () => {
 
   const handleSearch = (value: string) => {
     setSearchText(value);
+    filterRoles(value);
+  };
+
+  const handleResetFilters = () => {
+    setSearchText('');
+    filterRoles('');
+  };
+
+  const filterRoles = (search: string) => {
     const filtered = dummyRoles.filter(role =>
-      role.name.includes(value) || role.description.includes(value)
+      role.name.includes(search) || role.description.includes(search)
     );
     setRoles(filtered);
   };
@@ -79,17 +88,24 @@ const RolesPage: React.FC = () => {
   return (
     <div>
       <h1>角色列表</h1>
-      <Space style={{ marginBottom: 16 }}>
-        <Search
-          placeholder="搜索角色名称或描述"
-          onSearch={handleSearch}
-          style={{ width: 250 }}
-          allowClear
-        />
-        <Link href="/roles/new">
-          <Button type="primary" icon={<PlusOutlined />}>新增角色</Button>
-        </Link>
-      </Space>
+      <Row justify="space-between" style={{ marginBottom: 16 }}>
+        <Space>
+          <Search
+            placeholder="搜索角色名称或描述"
+            onSearch={handleSearch}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 250 }}
+            allowClear
+            value={searchText}
+          />
+          <Button onClick={handleResetFilters}>重置</Button>
+        </Space>
+        <Space>
+          <Link href="/roles/new">
+            <Button type="primary" icon={<PlusOutlined />}>新增角色</Button>
+          </Link>
+        </Space>
+      </Row>
       <Table columns={columns} dataSource={roles} rowKey="id" pagination={{ pageSize: 10 }} />
     </div>
   );
