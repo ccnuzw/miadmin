@@ -19,6 +19,8 @@ const dummyPermissions: Permission[] = [
   { id: '9', name: '权限列表查看', description: '允许查看权限列表', code: 'permission:list', module: '权限管理', type: '功能权限' },
   { id: '10', name: '仪表盘访问', description: '允许访问仪表盘', code: 'dashboard:view', module: '仪表盘', type: '菜单权限' },
   { id: '11', name: '系统设置访问', description: '允许访问系统设置', code: 'settings:view', module: '系统设置', type: '菜单权限' },
+  { id: '12', name: '新仪表盘访问', description: '允许访问新仪表盘', code: 'new-dashboard:view', module: '新仪表盘', type: '菜单权限' },
+  { id: '13', name: '组件展示访问', description: '允许访问组件展示', code: 'component-showcase:view', module: '组件展示', type: '菜单权限' },
 ];
 
 const PermissionsPage: React.FC = () => {
@@ -58,6 +60,8 @@ const PermissionsPage: React.FC = () => {
         { text: '角色管理', value: '角色管理' },
         { text: '权限管理', value: '权限管理' },
         { text: '仪表盘', value: '仪表盘' },
+        { text: '新仪表盘', value: '新仪表盘' },
+        { text: '组件展示', value: '组件展示' },
         { text: '系统设置', value: '系统设置' },
       ],
       onFilter: (value, record) => record.module.includes(value as string),

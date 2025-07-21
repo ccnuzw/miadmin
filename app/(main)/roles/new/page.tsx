@@ -13,6 +13,14 @@ const treeData = [
     key: 'dashboard',
   },
   {
+    title: '新仪表盘',
+    key: 'new-dashboard',
+  },
+  {
+    title: '组件展示',
+    key: 'component-showcase',
+  },
+  {
     title: '用户管理',
     key: 'user-management',
     children: [
