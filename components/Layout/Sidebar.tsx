@@ -19,7 +19,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed} style={{ background: '#fff' }}>
+    <Sider trigger={null} collapsible collapsed={collapsed} width={200} collapsedWidth={80} style={{ background: '#fff' }}>
       <div className="demo-logo-vertical" style={{ height: 32, margin: 16, background: 'rgba(0,0,0,.02)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {!collapsed && <h1 style={{ color: '#000', fontSize: '18px', margin: 0 }}>MiAdmin</h1>}
       </div>

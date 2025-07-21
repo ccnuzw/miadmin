@@ -20,7 +20,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   } = theme.useToken();
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="!min-h-screen" hasSider style={{ minHeight: '100vh', display: 'flex', flexDirection: 'row' }}>
       <Sidebar collapsed={collapsed} />
       <Layout>
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
