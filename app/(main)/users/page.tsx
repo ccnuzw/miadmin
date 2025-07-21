@@ -1,12 +1,11 @@
 'use client';
 import React, { useState } from 'react';
-import { Table, Button, Input, Space, Modal, Switch, Tag, Select, message } from 'antd';
+import { Table, Button, Input, Space, Modal, Switch, Tag, Select, message, App } from 'antd';
 import { EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 import Link from 'next/link';
 
 const { Search } = Input;
-const { confirm } = Modal;
 
 interface User {
   id: string;
@@ -28,6 +27,7 @@ const dummyUsers: User[] = [
 ];
 
 const UsersPage: React.FC = () => {
+  const { modal } = App.useApp();
   const [users, setUsers] = useState<User[]>(dummyUsers);
   const [searchText, setSearchText] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<boolean | undefined>(undefined);
@@ -71,9 +71,11 @@ const UsersPage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    confirm({
+    modal.confirm({
       title: '确定要删除此用户吗？',
       content: '删除后将无法恢复！',
+      okText: '确定',
+      cancelText: '取消',
       onOk() {
         setUsers(users.filter(user => user.id !== id));
         message.success('用户删除成功！');
@@ -85,9 +87,11 @@ const UsersPage: React.FC = () => {
   };
 
   const handleResetPassword = (id: string) => {
-    confirm({
+    modal.confirm({
       title: '确定要重置此用户密码吗？',
       content: '重置后密码将变为初始密码，请及时通知用户！',
+      okText: '确定',
+      cancelText: '取消',
       onOk() {
         message.success(`用户 ${id} 密码已重置！`);
       },

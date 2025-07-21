@@ -64,7 +64,7 @@ const functionalPermissions = [
   { label: '查看敏感信息', value: 'view-sensitive-info' },
 ];
 
-const RoleDetailPage: React.FC = () => {
+const RoleDetailPage: React.FC<{ params: { id: string } }> = ({ params }) => {
   const router = useRouter();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -72,7 +72,7 @@ const RoleDetailPage: React.FC = () => {
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
   const [functionalCheckedList, setFunctionalCheckedList] = useState<string[]>([]);
 
-  const roleId = router.query?.id; // Get ID from URL
+  const roleId = params.id; // Get ID from URL params
 
   useEffect(() => {
     if (roleId) {
@@ -80,7 +80,6 @@ const RoleDetailPage: React.FC = () => {
       const role = dummyRoles.find(r => r.id === roleId);
       if (role) {
         setCurrentRole(role);
-        form.setFieldsValue(role);
         // Simulate fetching permissions for the role
         if (role.name === '管理员') {
           setCheckedKeys(['dashboard', 'user-management', 'user-list', 'user-add', 'user-edit', 'user-delete', 'role-management', 'role-list', 'role-add', 'role-edit', 'role-delete', 'permission-management', 'system-settings', 'general-settings', 'notification-settings', 'log-management']);
@@ -126,7 +125,8 @@ const RoleDetailPage: React.FC = () => {
           form={form}
           layout="vertical"
           onFinish={onFinish}
-          initialValues={currentRole || {}}
+          initialValues={currentRole}
+          key={currentRole?.id} // Add key to force remount when currentRole changes
         >
           <Form.Item label="角色名称" name="name" rules={[{ required: true, message: '请输入角色名称!' }]}>
             <Input />

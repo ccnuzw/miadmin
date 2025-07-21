@@ -1,12 +1,11 @@
 'use client';
 import React, { useState } from 'react';
-import { Table, Button, Input, Space, Modal, Form, Switch, message, Typography, Card, Select } from 'antd';
+import { Table, Button, Input, Space, Modal, Form, Switch, message, Typography, Card, Select, App } from 'antd';
 const { Option } = Select;
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 const { TextArea } = Input;
-const { confirm } = Modal;
 
 interface NotificationTemplate {
   id: string;
@@ -36,6 +35,7 @@ const dummyPolicies: NotificationPolicy[] = [
 ];
 
 const NotificationsPage: React.FC = () => {
+  const { modal } = App.useApp();
   const [templates, setTemplates] = useState<NotificationTemplate[]>(dummyTemplates);
   const [policies, setPolicies] = useState<NotificationPolicy[]>(dummyPolicies);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -75,9 +75,11 @@ const NotificationsPage: React.FC = () => {
   };
 
   const handleDeleteTemplate = (id: string) => {
-    confirm({
+    modal.confirm({
       title: '确定要删除此通知模板吗？',
       content: '删除后将无法恢复！',
+      okText: '确定',
+      cancelText: '取消',
       onOk() {
         setTemplates(templates.filter(t => t.id !== id));
         message.success('模板删除成功！');
@@ -145,6 +147,8 @@ const NotificationsPage: React.FC = () => {
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        okText="确定"
+        cancelText="取消"
         confirmLoading={false} // Add loading state if API call is involved
       >
         <Form form={form} layout="vertical">

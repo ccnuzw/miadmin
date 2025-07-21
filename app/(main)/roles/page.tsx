@@ -1,13 +1,12 @@
 'use client';
 import React, { useState } from 'react';
-import { Table, Button, Input, Space, Modal, message } from 'antd';
+import { Table, Button, Input, Space, Modal, message, App } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 import Link from 'next/link';
 import { Role } from '@/lib/types';
 
 const { Search } = Input;
-const { confirm } = Modal;
 
 const dummyRoles: Role[] = [
   { id: '1', name: '管理员', description: '系统最高权限，拥有所有操作权限' },
@@ -17,6 +16,7 @@ const dummyRoles: Role[] = [
 ];
 
 const RolesPage: React.FC = () => {
+  const { modal } = App.useApp();
   const [roles, setRoles] = useState<Role[]>(dummyRoles);
   const [searchText, setSearchText] = useState<string>('');
 
@@ -29,9 +29,11 @@ const RolesPage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    confirm({
+    modal.confirm({
       title: '确定要删除此角色吗？',
       content: '删除后将无法恢复！',
+      okText: '确定',
+      cancelText: '取消',
       onOk() {
         setRoles(roles.filter(role => role.id !== id));
         message.success('角色删除成功！');

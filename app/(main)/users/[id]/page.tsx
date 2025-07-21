@@ -9,20 +9,20 @@ const { Title } = Typography;
 
 // Dummy data for users and roles
 const dummyUsers: User[] = [
-  { id: '1', username: 'admin', email: 'admin@example.com', role: '管理员' },
-  { id: '2', username: 'user1', email: 'user1@example.com', role: '普通用户' },
-  { id: '3', username: 'editor1', email: 'editor1@example.com', role: '编辑' },
+  { id: '1', username: 'admin', email: 'admin@example.com', roles: ['管理员'], phone: '13800138000', status: true },
+  { id: '2', username: 'user1', email: 'user1@example.com', roles: ['普通用户'], phone: '13912345678', status: true },
+  { id: '3', username: 'editor1', email: 'editor1@example.com', roles: ['编辑'], phone: '13787654321', status: false },
 ];
 
 const dummyRoles = ['管理员', '编辑', '普通用户', '访客'];
 
-const UserDetailPage: React.FC = () => {
+const UserDetailPage: React.FC<{ params: { id: string } }> = ({ params }) => {
   const router = useRouter();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  const userId = router.query?.id; // Get ID from URL
+  const userId = params.id; // Get ID from URL params
 
   useEffect(() => {
     if (userId) {
@@ -30,7 +30,6 @@ const UserDetailPage: React.FC = () => {
       const user = dummyUsers.find(u => u.id === userId);
       if (user) {
         setCurrentUser(user);
-        form.setFieldsValue(user);
       } else {
         message.error('用户未找到！');
         router.push('/users');
@@ -77,7 +76,8 @@ const UserDetailPage: React.FC = () => {
           form={form}
           layout="vertical"
           onFinish={onFinish}
-          initialValues={currentUser || {}}
+          initialValues={currentUser}
+          key={currentUser?.id} // Add key to force remount when currentUser changes
         >
           <Form.Item label="用户名" name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
             <Input />
@@ -88,8 +88,8 @@ const UserDetailPage: React.FC = () => {
           <Form.Item label="手机号" name="phone">
             <Input />
           </Form.Item>
-          <Form.Item label="角色" name="role">
-            <Select placeholder="选择角色">
+          <Form.Item label="角色" name="roles">
+            <Select mode="multiple" placeholder="选择角色">
               {dummyRoles.map(role => (
                 <Option key={role} value={role}>{role}</Option>
               ))}
