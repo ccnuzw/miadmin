@@ -13,6 +13,7 @@ const pathNameMap: { [key: string]: string } = {
   notifications: '通知设置',
   'new-dashboard': '新仪表盘',
   new: '新增',
+  'component-showcase': '组件展示',
   // Add more mappings as needed
 };
 

@@ -39,6 +39,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
             label: <Link href="/new-dashboard">新仪表盘</Link>,
           },
           {
+            key: 'component-showcase',
+            icon: <DashboardOutlined />,
+            label: <Link href="/component-showcase">组件展示</Link>,
+          },
+          {
             key: 'sub1',
             icon: <UserOutlined />,
             label: '用户管理',
