@@ -11,6 +11,7 @@ const pathNameMap: { [key: string]: string } = {
   settings: '系统设置',
   logs: '日志管理',
   notifications: '通知设置',
+  'new-dashboard': '新仪表盘',
   new: '新增',
   // Add more mappings as needed
 };
