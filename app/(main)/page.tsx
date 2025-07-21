@@ -8,6 +8,11 @@ import Link from 'next/link';
 const { Title } = Typography;
 
 const DashboardPage: React.FC = () => {
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
   // Dummy data for charts
   const userData = [
     { year: '2023-01', value: 300 },
@@ -148,12 +153,12 @@ const DashboardPage: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} md={12}>
           <Card title="用户增长趋势">
-            <Line {...userGrowthConfig} />
+            {isClient && <Line {...userGrowthConfig} />}
           </Card>
         </Col>
         <Col xs={24} md={12}>
           <Card title="角色分布">
-            <Pie {...roleDistributionConfig} />
+            {isClient && <Pie {...roleDistributionConfig} />}
           </Card>
         </Col>
       </Row>
@@ -161,7 +166,7 @@ const DashboardPage: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24}>
           <Card title="操作类型统计">
-            <Column {...operationTypeConfig} />
+            {isClient && <Column {...operationTypeConfig} />}
           </Card>
         </Col>
       </Row>
