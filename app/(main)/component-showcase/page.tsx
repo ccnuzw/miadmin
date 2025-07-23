@@ -149,10 +149,6 @@ const ComponentShowcasePage: React.FC = () => {
     angleField: 'value',
     colorField: 'type',
     radius: 0.8,
-    label: {
-      type: 'outer',
-      content: '{name} {percentage}',
-    },
     interactions: [{
       type: 'pie-legend-active',
     }, {
@@ -169,10 +165,6 @@ const ComponentShowcasePage: React.FC = () => {
     colorField: 'type',
     radius: 0.8,
     innerRadius: 0.6,
-    label: {
-      type: 'outer',
-      content: '{name} {percentage}',
-    },
     interactions: [{
       type: 'pie-legend-active',
     }, {
@@ -302,6 +294,7 @@ const ComponentShowcasePage: React.FC = () => {
     height: 300,
   };
 
+  /*
   const gaugeConfig = {
     percent: gaugeData.value,
     range: { ticks: [0, 1], color: 'l(0) 0:#BEE5F9 1:#5B8FF9' },
@@ -310,6 +303,7 @@ const ComponentShowcasePage: React.FC = () => {
     autoFit: true,
     height: 300,
   };
+  */
 
   const liquidConfig = {
     percent: liquidData,
@@ -355,7 +349,7 @@ const ComponentShowcasePage: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24}>
           <Card title="双 Y 轴图">
-            {isClient && <DualAxes {...dualAxesConfig} />}
+            {/* {isClient && <DualAxes {...dualAxesConfig} />} */}
           </Card>
         </Col>
       </Row>

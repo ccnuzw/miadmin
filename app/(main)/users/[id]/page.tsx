@@ -22,7 +22,7 @@ const UserDetailPage: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  const userId = params.id; // Get ID from URL params
+  const userId = React.use(params).id; // Get ID from URL params
 
   useEffect(() => {
     if (userId) {

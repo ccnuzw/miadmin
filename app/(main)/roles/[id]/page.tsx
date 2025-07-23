@@ -80,7 +80,7 @@ const RoleDetailPage: React.FC<{ params: { id: string } }> = ({ params }) => {
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
   const [functionalCheckedList, setFunctionalCheckedList] = useState<string[]>([]);
 
-  const roleId = params.id; // Get ID from URL params
+  const roleId = React.use(params).id; // Get ID from URL params
 
   useEffect(() => {
     if (roleId) {
