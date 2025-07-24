@@ -21,7 +21,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <Layout className="!min-h-screen" hasSider style={{ minHeight: '100vh', display: 'flex', flexDirection: 'row' }}>
-      <Sidebar collapsed={collapsed} />
+      <Sidebar collapsed={collapsed} onCollapse={setCollapsed} />
       <Layout>
         <Header collapsed={collapsed} setCollapsed={setCollapsed} />
         <Content style={{ margin: '24px 16px', padding: 24, minHeight: 280, background: colorBgContainer, borderRadius: borderRadiusLG }}>

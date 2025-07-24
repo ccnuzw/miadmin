@@ -15,11 +15,25 @@ const { Sider } = Layout;
 
 interface SidebarProps {
   collapsed: boolean;
+  onCollapse?: (collapsed: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
+const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed} width={200} collapsedWidth={80} style={{ background: '#fff' }}>
+    <Sider
+      trigger={null}
+      collapsible
+      collapsed={collapsed}
+      breakpoint="lg" // 当屏幕宽度小于 lg (992px) 时触发响应式
+      onCollapse={(value) => {
+        if (onCollapse) {
+          onCollapse(value);
+        }
+      }}
+      width={200}
+      collapsedWidth={80}
+      style={{ background: '#fff' }}
+    >
       <div className="demo-logo-vertical" style={{ height: 32, margin: 16, background: 'rgba(0,0,0,.02)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {!collapsed && <h1 style={{ color: '#000', fontSize: '18px', margin: 0 }}>MiAdmin</h1>}
       </div>

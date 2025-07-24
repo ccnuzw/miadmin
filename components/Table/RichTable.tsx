@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Input, Button, Space, Select, Tag, PaginationProps } from 'antd';
+import { Table, Input, Button, Space, Select, Tag, Grid } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 
 const { Search } = Input;
 const { Option } = Select;
+const { useBreakpoint } = Grid;
 
 interface RichTableProps<T> {
   columns: ColumnsType<T>;
@@ -37,6 +38,7 @@ function RichTable<T extends object>({
   initialSearch,
   initialFilters,
 }: RichTableProps<T>) {
+  const screens = useBreakpoint();
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState<TablePaginationConfig>({
@@ -70,13 +72,14 @@ function RichTable<T extends object>({
       setPagination((prev) => ({
         ...prev,
         total: result.total,
+        simple: !screens.lg, // 在小屏幕上使用 simple 模式
       }));
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
       setLoading(false);
     }
-  }, [pagination.current, pagination.pageSize, sortBy, sortOrder, search, filters, fetchData]);
+  }, [pagination.current, pagination.pageSize, sortBy, sortOrder, search, filters, fetchData, screens.lg]);
 
   useEffect(() => {
     loadData();
@@ -166,7 +169,7 @@ function RichTable<T extends object>({
         dataSource={data}
         rowKey={rowKey}
         loading={loading}
-        pagination={pagination}
+        pagination={{ ...pagination, simple: !screens.lg }} // 动态设置 simple 模式
         onChange={handleTableChange}
         rowSelection={rowSelection}
         scroll={{ x: 'max-content' }} // Enable horizontal scrolling for many columns
@@ -176,3 +179,4 @@ function RichTable<T extends object>({
 }
 
 export default RichTable;
+

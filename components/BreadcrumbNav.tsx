@@ -39,7 +39,7 @@ const BreadcrumbNav: React.FC = () => {
   }
 
   return (
-    <Breadcrumb style={{ margin: '0 16px' }} items={breadcrumbItems} />
+    <Breadcrumb className="hidden md:block" style={{ margin: '0 16px' }} items={breadcrumbItems} />
   );
 };
 
