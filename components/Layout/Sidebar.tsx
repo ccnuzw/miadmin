@@ -44,6 +44,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
             label: <Link href="/component-showcase">组件展示</Link>,
           },
           {
+            key: 'list-showcase',
+            icon: <FileTextOutlined />,
+            label: <Link href="/list-showcase">列表展示</Link>,
+          },
+          {
             key: 'sub1',
             icon: <UserOutlined />,
             label: '用户管理',
