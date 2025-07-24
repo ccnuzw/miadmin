@@ -7,6 +7,9 @@ export interface User {
   phone?: string;
   roles: string[];
   status: boolean;
+  departmentIds?: string[];
+  unit?: string; // New field for unit
+  department?: string; // New field for department
 }
 
 export interface Role {

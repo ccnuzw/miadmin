@@ -161,9 +161,17 @@ export const MOCK_ROLES = [
   { id: 'role-marketing', name: '市场人员' }, // 新增
 ];
 
-// 模拟部门成员数据 (用于部门详情页列表)
-// 结构更新：使用部门的key作为键，value是该部门下的成员列表
-export const MOCK_DEPARTMENT_MEMBERS: { [deptKey: string]: DepartmentMember[] } = {
+// 模拟组织/部门成员数据 (用于详情页列表)
+export const MOCK_ORGANIZATION_MEMBERS: { [orgUnitOrDeptKey: string]: DepartmentMember[] } = {
+  'org-hq': [ // 全球总部成员
+    { userId: 'user-008', username: '王总', employeeId: 'E008', contact: '13900001111', assignedRoleNames: ['系统管理员', '部门经理'] },
+  ],
+  'org-north': [ // 北方大区成员
+    { userId: 'user-009', username: '李区长', employeeId: 'E009', contact: '13812340000', assignedRoleNames: ['部门经理'] },
+  ],
+  'org-bj': [ // 北京分公司成员
+    { userId: 'user-010', username: '张经理', employeeId: 'E010', contact: '13700001234', assignedRoleNames: ['部门经理'] },
+  ],
   'dept-bj-sales': [ // 北京分公司销售部成员
     { userId: 'user-001', username: '张三', employeeId: 'E001', contact: '13812345678', assignedRoleNames: ['销售人员'] },
     { userId: 'user-004', username: '刘丽', employeeId: 'E004', contact: '13611112222', assignedRoleNames: ['访客'] },
@@ -179,7 +187,7 @@ export const MOCK_DEPARTMENT_MEMBERS: { [deptKey: string]: DepartmentMember[] } 
   ],
   'dept-cloud-dev': [ // 智慧云子公司云产品研发部
     { userId: 'user-007', username: '孙悟空', employeeId: 'E007', contact: '15912345678', assignedRoleNames: ['开发人员'] },
-  ]
+  ],
   // ... 其他部门的成员
 };
 

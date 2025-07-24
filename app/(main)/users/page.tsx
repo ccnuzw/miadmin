@@ -17,7 +17,8 @@ interface User {
   phone: string;
   roles: string[];
   status: boolean; // true for enabled, false for disabled
-  createdAt: string;
+  unit: string; // New field for unit
+  department: string; // New field for department
   lastLogin: string;
 }
 
@@ -29,7 +30,8 @@ const dummyUsers: User[] = Array.from({ length: 50 }, (_, i) => ({
   phone: `138${String(Math.floor(Math.random() * 100000000)).padStart(8, '0')}`,
   roles: i % 3 === 0 ? ['管理员'] : (i % 3 === 1 ? ['编辑'] : ['普通用户']),
   status: i % 2 === 0,
-  createdAt: new Date(Date.now() - i * 86400000).toISOString().split('T')[0],
+  unit: i % 2 === 0 ? '全球总部' : '智慧云子公司',
+  department: i % 3 === 0 ? '销售部' : (i % 3 === 1 ? '人力资源部' : '前端组'),
   lastLogin: new Date(Date.now() - i * 3600000).toISOString().split('T')[0],
 }));
 
@@ -171,12 +173,18 @@ const UsersPage: React.FC = () => {
       ),
     },
     {
-      title: '创建时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      sorter: true, // 启用 RichTable 的排序
-      width: 150,
-      responsive: ['lg'], // 在大屏幕及以上显示
+      title: '单位',
+      dataIndex: 'unit',
+      key: 'unit',
+      width: 120,
+      responsive: ['md'],
+    },
+    {
+      title: '部门',
+      dataIndex: 'department',
+      key: 'department',
+      width: 120,
+      responsive: ['md'],
     },
     {
       title: '最后登录',

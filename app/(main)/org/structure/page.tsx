@@ -12,7 +12,7 @@ import {
   PlusOutlined,
   UserAddOutlined,
 } from '@ant-design/icons';
-import { MOCK_ORGANIZATION_STRUCTURE_TREE_DATA, MOCK_DEPARTMENT_MEMBERS, OrgTreeNode, DepartmentMember } from '@/lib/constants';
+import { MOCK_ORGANIZATION_STRUCTURE_TREE_DATA, MOCK_ORGANIZATION_MEMBERS, OrgTreeNode, DepartmentMember } from '@/lib/constants';
 import OrgTree from '../components/OrgTree';
 import OrgUnitOrDepartmentForm from '../components/OrgUnitOrDepartmentForm';
 
@@ -123,14 +123,62 @@ const OrganizationStructurePage: React.FC = () => {
     });
   };
 
-  const departmentMembers = useMemo(() => {
-    if (selectedNode && selectedNode.type === 'department') {
-      return MOCK_DEPARTMENT_MEMBERS[selectedNode.key] || [];
+  const organizationMembers = useMemo(() => {
+    if (!selectedNode) {
+      return [];
     }
-    return [];
+
+    const relevantKeysForMembers: string[] = [];
+
+    // Helper function to get node title by key
+    const getNodeTitleByKey = (key: string, nodes: OrgTreeNode[]): string | undefined => {
+      for (const node of nodes) {
+        if (node.key === key) {
+          return node.title;
+        }
+        if (node.children) {
+          const foundTitle = getNodeTitleByKey(key, node.children);
+          if (foundTitle) {
+            return foundTitle;
+          }
+        }
+      }
+      return undefined;
+    };
+
+    // Add the selected node's key if it has direct members
+    if (MOCK_ORGANIZATION_MEMBERS[selectedNode.key]) {
+      relevantKeysForMembers.push(selectedNode.key);
+    }
+
+    // Helper function to collect descendant department keys (only departments, not sub-orgUnits)
+    const collectDescendantDepartmentKeys = (node: OrgTreeNode) => {
+      if (node.children) {
+        for (const child of node.children) {
+          if (child.type === 'department') {
+            relevantKeysForMembers.push(child.key);
+            collectDescendantDepartmentKeys(child); // Recurse for sub-departments
+          }
+          // If child.type is 'orgUnit', we do NOT recurse further down this branch
+          // for the current selectedNode's employee list.
+        }
+      }
+    };
+
+    collectDescendantDepartmentKeys(selectedNode);
+
+    const members: (DepartmentMember & { belongingToName?: string })[] = [];
+    for (const key of relevantKeysForMembers) {
+      if (MOCK_ORGANIZATION_MEMBERS[key]) {
+        const nodeTitle = getNodeTitleByKey(key, MOCK_ORGANIZATION_STRUCTURE_TREE_DATA);
+        members.push(...MOCK_ORGANIZATION_MEMBERS[key].map(member => ({ ...member, belongingToName: nodeTitle })));
+      }
+    }
+    return members;
   }, [selectedNode]);
 
   const memberColumns = [
+    { title: '部门', dataIndex: 'belongingToName', key: 'belongingToName' },
     { title: '姓名', dataIndex: 'username', key: 'username' },
     { title: '工号', dataIndex: 'employeeId', key: 'employeeId' },
     { title: '联系方式', dataIndex: 'contact', key: 'contact' },
@@ -196,23 +244,21 @@ const OrganizationStructurePage: React.FC = () => {
               {/* Add more details as needed */}
             </Card>
 
-            {selectedNode.type === 'department' && (
-              <Card
-                title="部门成员"
-                extra={
-                  <Button type="primary" icon={<UserAddOutlined />} onClick={handleAddMember}>
-                    添加成员
-                  </Button>
-                }
-              >
-                <Table
-                  columns={memberColumns}
-                  dataSource={departmentMembers}
-                  rowKey="userId"
-                  pagination={false}
-                />
-              </Card>
-            )}
+            <Card
+              title={selectedNode.type === 'department' ? '部门成员' : '组织成员'}
+              extra={
+                <Button type="primary" icon={<UserAddOutlined />} onClick={handleAddMember}>
+                  添加成员
+                </Button>
+              }
+            >
+              <Table
+                columns={memberColumns}
+                dataSource={organizationMembers}
+                rowKey="userId"
+                pagination={false}
+              />
+            </Card>
           </>
         ) : (
           <Card>
