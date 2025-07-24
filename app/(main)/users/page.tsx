@@ -1,11 +1,14 @@
 'use client';
-import React, { useState } from 'react';
-import { Table, Button, Input, Space, Modal, Switch, Tag, Select, message, App, Row } from 'antd';
-import { EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
-import type { TableProps } from 'antd';
+import React, { useState, useCallback } from 'react';
+import { Button, Input, Space, Modal, Switch, Tag, Select, message, App, Dropdown, Menu, Grid } from 'antd';
+import { EditOutlined, DeleteOutlined, ReloadOutlined, PlusOutlined, MoreOutlined } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
 import Link from 'next/link';
+import RichTable from '@/components/Table/RichTable'; // 导入 RichTable
 
 const { Search } = Input;
+const { Option } = Select;
+const { useBreakpoint } = Grid; // 导入 useBreakpoint
 
 interface User {
   id: string;
@@ -18,64 +21,22 @@ interface User {
   lastLogin: string;
 }
 
-const dummyUsers: User[] = [
-  { id: '1', username: 'admin', email: 'admin@example.com', phone: '13800000001', roles: ['管理员', '编辑'], status: true, createdAt: '2023-01-01', lastLogin: '2023-07-19' },
-  { id: '2', username: 'user1', email: 'user1@example.com', phone: '13800000002', roles: ['普通用户'], status: true, createdAt: '2023-01-05', lastLogin: '2023-07-18' },
-  { id: '3', username: 'editor1', email: 'editor1@example.com', phone: '13800000003', roles: ['编辑'], status: false, createdAt: '2023-01-10', lastLogin: '2023-07-17' },
-  { id: '4', username: 'guest', email: 'guest@example.com', phone: '13800000004', roles: ['访客'], status: true, createdAt: '2023-02-01', lastLogin: '2023-07-19' },
-  { id: '5', username: 'user2', email: 'user2@example.com', phone: '13800000005', roles: ['普通用户'], status: true, createdAt: '2023-02-15', lastLogin: '2023-07-16' },
-];
+// 模拟数据，可以根据需要增加更多数据
+const dummyUsers: User[] = Array.from({ length: 50 }, (_, i) => ({
+  id: `${i + 1}`,
+  username: `user${i + 1}`,
+  email: `user${i + 1}@example.com`,
+  phone: `138${String(Math.floor(Math.random() * 100000000)).padStart(8, '0')}`,
+  roles: i % 3 === 0 ? ['管理员'] : (i % 3 === 1 ? ['编辑'] : ['普通用户']),
+  status: i % 2 === 0,
+  createdAt: new Date(Date.now() - i * 86400000).toISOString().split('T')[0],
+  lastLogin: new Date(Date.now() - i * 3600000).toISOString().split('T')[0],
+}));
+
 
 const UsersPage: React.FC = () => {
   const { modal } = App.useApp();
-  const [users, setUsers] = useState<User[]>(dummyUsers);
-  const [searchText, setSearchText] = useState<string>('');
-  const [filterStatus, setFilterStatus] = useState<boolean | undefined>(undefined);
-  const [filterRole, setFilterRole] = useState<string | undefined>(undefined);
-
-  const handleResetFilters = () => {
-    setSearchText('');
-    setFilterStatus(undefined);
-    setFilterRole(undefined);
-    filterUsers('', undefined, undefined);
-  };
-
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-    filterUsers(value, filterStatus, filterRole);
-  };
-
-  const handleStatusChange = (value: boolean | undefined) => {
-    setFilterStatus(value);
-    filterUsers(searchText, value, filterRole);
-  };
-
-  const handleRoleChange = (value: string | undefined) => {
-    setFilterRole(value);
-    filterUsers(searchText, filterStatus, value);
-  };
-
-  const filterUsers = (search: string, status: boolean | undefined, role: string | undefined) => {
-    let filtered = dummyUsers;
-
-    if (search) {
-      filtered = filtered.filter(user =>
-        user.username.includes(search) ||
-        user.email.includes(search) ||
-        user.phone.includes(search)
-      );
-    }
-
-    if (status !== undefined) {
-      filtered = filtered.filter(user => user.status === status);
-    }
-
-    if (role) {
-      filtered = filtered.filter(user => user.roles.includes(role));
-    }
-
-    setUsers(filtered);
-  };
+  const screens = useBreakpoint(); // 获取屏幕断点
 
   const handleDelete = (id: string) => {
     modal.confirm({
@@ -84,7 +45,7 @@ const UsersPage: React.FC = () => {
       okText: '确定',
       cancelText: '取消',
       onOk() {
-        setUsers(users.filter(user => user.id !== id));
+        // 实际项目中这里会调用API删除用户
         message.success('用户删除成功！');
       },
       onCancel() {
@@ -109,33 +70,82 @@ const UsersPage: React.FC = () => {
   };
 
   const handleStatusToggle = (id: string, checked: boolean) => {
-    setUsers(users.map(user =>
-      user.id === id ? { ...user, status: checked } : user
-    ));
+    // 实际项目中这里会调用API更新用户状态
     message.success(`用户 ${id} 已${checked ? '启用' : '禁用'}！`);
   };
 
-  const columns: TableProps<User>['columns'] = [
+  // 模拟 fetchData 函数，适配 RichTable 的接口
+  const fetchUsers = useCallback(async (params: any) => {
+    let filtered = dummyUsers;
+
+    // 搜索
+    if (params.search) {
+      const lowerCaseSearch = params.search.toLowerCase();
+      filtered = filtered.filter(user =>
+        user.username.toLowerCase().includes(lowerCaseSearch) ||
+        user.email.toLowerCase().includes(lowerCaseSearch) ||
+        user.phone.toLowerCase().includes(lowerCaseSearch)
+      );
+    }
+
+    // 状态过滤
+    if (params.filters?.status !== undefined) {
+      filtered = filtered.filter(user => user.status === (params.filters.status === 'true'));
+    }
+
+    // 角色过滤
+    if (params.filters?.role) {
+      filtered = filtered.filter(user => user.roles.includes(params.filters.role));
+    }
+
+    // 排序
+    if (params.sortBy) {
+      filtered.sort((a, b) => {
+        const aValue = (a as any)[params.sortBy];
+        const bValue = (b as any)[params.sortBy];
+
+        if (aValue < bValue) return params.sortOrder === 'asc' ? -1 : 1;
+        if (aValue > bValue) return params.sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    const total = filtered.length;
+    const startIndex = (params.page - 1) * params.pageSize;
+    const endIndex = Math.min(startIndex + params.pageSize, total);
+    const paginatedData = filtered.slice(startIndex, endIndex);
+
+    return { data: paginatedData, total };
+  }, []);
+
+
+  const columns: ColumnsType<User> = [
     {
       title: '用户名',
       dataIndex: 'username',
       key: 'username',
-      sorter: (a, b) => a.username.localeCompare(b.username),
+      sorter: true, // 启用 RichTable 的排序
+      width: 120,
     },
     {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
+      width: 180,
+      responsive: ['md'], // 在中等屏幕及以上显示
     },
     {
       title: '手机号',
       dataIndex: 'phone',
       key: 'phone',
+      width: 150,
+      responsive: ['lg'], // 在大屏幕及以上显示
     },
     {
       title: '角色',
       dataIndex: 'roles',
       key: 'roles',
+      width: 120,
       render: (roles: string[]) => (
         <>
           {roles.map(role => (
@@ -145,18 +155,12 @@ const UsersPage: React.FC = () => {
           ))}
         </>
       ),
-      filters: [
-        { text: '管理员', value: '管理员' },
-        { text: '编辑', value: '编辑' },
-        { text: '普通用户', value: '普通用户' },
-        { text: '访客', value: '访客' },
-      ],
-      onFilter: (value, record) => record.roles.includes(value as string),
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      width: 100,
       render: (status: boolean, record) => (
         <Switch
           checkedChildren="启用"
@@ -165,84 +169,99 @@ const UsersPage: React.FC = () => {
           onChange={(checked) => handleStatusToggle(record.id, checked)}
         />
       ),
-      filters: [
-        { text: '启用', value: true },
-        { text: '禁用', value: false },
-      ],
-      onFilter: (value, record) => record.status === value,
     },
     {
       title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      sorter: true, // 启用 RichTable 的排序
+      width: 150,
+      responsive: ['lg'], // 在大屏幕及以上显示
     },
     {
       title: '最后登录',
       dataIndex: 'lastLogin',
       key: 'lastLogin',
-      sorter: (a, b) => new Date(a.lastLogin).getTime() - new Date(b.lastLogin).getTime(),
+      sorter: true, // 启用 RichTable 的排序
+      width: 150,
+      responsive: ['lg'], // 在大屏幕及以上显示
     },
     {
       title: '操作',
       key: 'action',
+      width: 150,
+      fixed: 'right', // 固定操作列
       render: (_, record) => (
-        <Space size="middle">
+        <Space size="small">
           <Link href={`/users/${record.id}`}>
-            <Button icon={<EditOutlined />}>编辑</Button>
+            <Button icon={<EditOutlined />} size="small">编辑</Button>
           </Link>
-          <Button icon={<ReloadOutlined />} onClick={() => handleResetPassword(record.id)}>重置密码</Button>
-          <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>删除</Button>
+          {screens.md ? ( // 在中等屏幕及以上显示完整按钮
+            <>
+              <Button icon={<ReloadOutlined />} onClick={() => handleResetPassword(record.id)} size="small">重置密码</Button>
+              <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} size="small">删除</Button>
+            </>
+          ) : ( // 在小屏幕上使用下拉菜单
+            <Dropdown
+              menu={{
+                items: [
+                  { key: 'reset', icon: <ReloadOutlined />, label: '重置密码', onClick: () => handleResetPassword(record.id) },
+                  { key: 'delete', icon: <DeleteOutlined />, label: '删除', danger: true, onClick: () => handleDelete(record.id) },
+                ],
+              }}
+              trigger={['click']}
+            >
+              <Button icon={<MoreOutlined />} size="small" />
+            </Dropdown>
+          )}
         </Space>
       ),
+    },
+  ];
+
+  const userFilterOptions = [
+    {
+      key: 'status',
+      label: '状态',
+      options: [
+        { value: 'true', label: '启用' },
+        { value: 'false', label: '禁用' },
+      ],
+    },
+    {
+      key: 'role',
+      label: '角色',
+      options: [
+        { value: '管理员', label: '管理员' },
+        { value: '编辑', label: '编辑' },
+        { value: '普通用户', label: '普通用户' },
+        { value: '访客', label: '访客' },
+      ],
     },
   ];
 
   return (
     <div>
       <h1>用户列表</h1>
-      <Row justify="space-between" style={{ marginBottom: 16 }}>
-        <Space>
-          <Search
-            placeholder="搜索用户名、邮箱或手机号"
-            onSearch={handleSearch}
-            style={{ width: 250 }}
-            allowClear
-            value={searchText}
-          />
-          <Select
-            placeholder="筛选状态"
-            allowClear
-            style={{ width: 120 }}
-            onChange={handleStatusChange}
-            value={filterStatus}
-            options={[
-              { value: true, label: '启用' },
-              { value: false, label: '禁用' },
-            ]}
-          />
-          <Select
-            placeholder="筛选角色"
-            allowClear
-            style={{ width: 120 }}
-            onChange={handleRoleChange}
-            value={filterRole}
-            options={[
-              { value: '管理员', label: '管理员' },
-              { value: '编辑', label: '编辑' },
-              { value: '普通用户', label: '普通用户' },
-              { value: '访客', label: '访客' },
-            ]}
-          />
-          <Button onClick={handleResetFilters}>重置</Button>
+      <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }} direction={screens.md ? 'horizontal' : 'vertical'}>
+        <Space direction={screens.md ? 'horizontal' : 'vertical'}>
+          {/* RichTable 内部会处理搜索框和筛选器 */}
         </Space>
         <Space>
           <Link href="/users/new">
             <Button type="primary" icon={<PlusOutlined />}>新增用户</Button>
           </Link>
         </Space>
-      </Row>
-      <Table columns={columns} dataSource={users} rowKey="id" pagination={{ pageSize: 10 }} />
+      </Space>
+      <RichTable<User>
+        columns={columns}
+        fetchData={fetchUsers}
+        rowKey="id"
+        searchPlaceholder="搜索用户名、邮箱或手机号"
+        filterOptions={userFilterOptions}
+        initialSortBy="createdAt"
+        initialSortOrder="desc"
+      />
     </div>
   );
 };

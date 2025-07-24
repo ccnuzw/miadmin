@@ -1,10 +1,12 @@
 'use client';
 import React, { useState } from 'react';
-import { Table, Input, Space, Tabs, Typography } from 'antd';
+import { Table, Input, Space, Tabs, Typography, Grid } from 'antd';
 import type { TableProps } from 'antd';
+import GeneralTable from '@/components/Table/GeneralTable'; // 导入 GeneralTable
 
 const { Search } = Input;
 const { Title } = Typography;
+const { useBreakpoint } = Grid;
 
 interface OperationLog {
   id: string;
@@ -23,23 +25,25 @@ interface LoginLog {
   status: '成功' | '失败';
 }
 
-const dummyOperationLogs: OperationLog[] = [
-  { id: '1', operator: 'admin', time: '2023-07-20 10:30:00', module: '用户管理', content: '编辑用户：user1', ip: '192.168.1.1' },
-  { id: '2', operator: 'editor1', time: '2023-07-20 10:25:15', module: '文章管理', content: '发布文章：Next.js 入门', ip: '192.168.1.2' },
-  { id: '3', operator: 'user1', time: '2023-07-20 10:20:00', module: '个人设置', content: '修改头像', ip: '192.168.1.3' },
-  { id: '4', operator: 'admin', time: '2023-07-20 10:15:30', module: '系统设置', content: '备份数据库', ip: '192.168.1.1' },
-  { id: '5', operator: 'admin', time: '2023-07-20 09:00:00', module: '登录', content: '用户登录', ip: '192.168.1.1' },
-];
+const dummyOperationLogs: OperationLog[] = Array.from({ length: 50 }, (_, i) => ({
+  id: `${i + 1}`,
+  operator: `操作员${i % 5}`,
+  time: new Date(Date.now() - i * 3600 * 1000).toLocaleString(),
+  module: ['用户管理', '文章管理', '系统设置', '权限管理'][i % 4],
+  content: `执行了操作 ${i + 1} 的内容描述`,
+  ip: `192.168.1.${i % 255}`,
+}));
 
-const dummyLoginLogs: LoginLog[] = [
-  { id: '1', username: 'admin', loginTime: '2023-07-20 10:30:00', loginIp: '192.168.1.1', status: '成功' },
-  { id: '2', username: 'editor1', loginTime: '2023-07-20 10:25:00', loginIp: '192.168.1.2', status: '成功' },
-  { id: '3', username: 'user1', loginTime: '2023-07-20 10:20:00', loginIp: '192.168.1.3', status: '成功' },
-  { id: '4', username: 'guest', loginTime: '2023-07-20 10:15:00', loginIp: '192.168.1.4', status: '失败' },
-  { id: '5', username: 'admin', loginTime: '2023-07-20 09:00:00', loginIp: '192.168.1.1', status: '成功' },
-];
+const dummyLoginLogs: LoginLog[] = Array.from({ length: 50 }, (_, i) => ({
+  id: `${i + 1}`,
+  username: `用户${i % 5}`,
+  loginTime: new Date(Date.now() - i * 3600 * 1000).toLocaleString(),
+  loginIp: `192.168.1.${i % 255}`,
+  status: i % 3 === 0 ? '失败' : '成功',
+}));
 
 const LogsPage: React.FC = () => {
+  const screens = useBreakpoint();
   const [operationLogs, setOperationLogs] = useState<OperationLog[]>(dummyOperationLogs);
   const [loginLogs, setLoginLogs] = useState<LoginLog[]>(dummyLoginLogs);
   const [activeTab, setActiveTab] = useState<string>('operationLogs');
@@ -63,18 +67,75 @@ const LogsPage: React.FC = () => {
   };
 
   const operationColumns: TableProps<OperationLog>['columns'] = [
-    { title: '操作人', dataIndex: 'operator', key: 'operator', sorter: (a, b) => a.operator.localeCompare(b.operator) },
-    { title: '操作时间', dataIndex: 'time', key: 'time', sorter: (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime() },
-    { title: '操作模块', dataIndex: 'module', key: 'module', filters: Array.from(new Set(dummyOperationLogs.map(log => log.module))).map(module => ({ text: module, value: module })), onFilter: (value, record) => record.module.includes(value as string) },
-    { title: '操作内容', dataIndex: 'content', key: 'content' },
-    { title: 'IP地址', dataIndex: 'ip', key: 'ip' },
+    {
+      title: '操作人',
+      dataIndex: 'operator',
+      key: 'operator',
+      sorter: (a, b) => a.operator.localeCompare(b.operator),
+      width: 120
+    },
+    {
+      title: '操作时间',
+      dataIndex: 'time',
+      key: 'time',
+      sorter: (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime(),
+      width: 180
+    },
+    {
+      title: '操作模块',
+      dataIndex: 'module',
+      key: 'module',
+      width: 120,
+      responsive: ['md'],
+      filters: Array.from(new Set(dummyOperationLogs.map(log => log.module))).map(module => ({ text: module, value: module })),
+      onFilter: (value, record) => record.module.includes(value as string)
+    },
+    {
+      title: '操作内容',
+      dataIndex: 'content',
+      key: 'content',
+      width: 250,
+      responsive: ['lg']
+    },
+    {
+      title: 'IP地址',
+      dataIndex: 'ip',
+      key: 'ip',
+      width: 120,
+      responsive: ['md']
+    },
   ];
 
   const loginColumns: TableProps<LoginLog>['columns'] = [
-    { title: '用户名', dataIndex: 'username', key: 'username', sorter: (a, b) => a.username.localeCompare(b.username) },
-    { title: '登录时间', dataIndex: 'loginTime', key: 'loginTime', sorter: (a, b) => new Date(a.loginTime).getTime() - new Date(b.loginTime).getTime() },
-    { title: '登录IP', dataIndex: 'loginIp', key: 'loginIp' },
-    { title: '状态', dataIndex: 'status', key: 'status', filters: [{ text: '成功', value: '成功' }, { text: '失败', value: '失败' }], onFilter: (value, record) => record.status === value },
+    {
+      title: '用户名',
+      dataIndex: 'username',
+      key: 'username',
+      sorter: (a, b) => a.username.localeCompare(b.username),
+      width: 120
+    },
+    {
+      title: '登录时间',
+      dataIndex: 'loginTime',
+      key: 'loginTime',
+      sorter: (a, b) => new Date(a.loginTime).getTime() - new Date(b.loginTime).getTime(),
+      width: 180
+    },
+    {
+      title: '登录IP',
+      dataIndex: 'loginIp',
+      key: 'loginIp',
+      width: 150,
+      responsive: ['md']
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      filters: [{ text: '成功', value: '成功' }, { text: '失败', value: '失败' }],
+      onFilter: (value, record) => record.status === value
+    },
   ];
 
   const items = [
@@ -87,11 +148,11 @@ const LogsPage: React.FC = () => {
             <Search
               placeholder="搜索操作人、模块、内容或IP"
               onSearch={handleOperationSearch}
-              style={{ width: 300 }}
+              style={{ width: screens.md ? 300 : '100%' }} // 宽度自适应
               allowClear
             />
           </div>
-          <Table columns={operationColumns} dataSource={operationLogs} rowKey="id" pagination={{ pageSize: 10 }} scroll={{ x: 'max-content' }} />
+          <GeneralTable columns={operationColumns} dataSource={operationLogs} rowKey="id" pagination={{ pageSize: 10 }} />
         </>
       ),
     },
@@ -104,11 +165,11 @@ const LogsPage: React.FC = () => {
             <Search
               placeholder="搜索用户名或IP"
               onSearch={handleLoginSearch}
-              style={{ width: 300 }}
+              style={{ width: screens.md ? 300 : '100%' }} // 宽度自适应
               allowClear
             />
           </div>
-          <Table columns={loginColumns} dataSource={loginLogs} rowKey="id" pagination={{ pageSize: 10 }} scroll={{ x: 'max-content' }} />
+          <GeneralTable columns={loginColumns} dataSource={loginLogs} rowKey="id" pagination={{ pageSize: 10 }} />
         </>
       ),
     },

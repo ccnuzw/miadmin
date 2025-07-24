@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
-import { Card, Typography, Space, Alert, Tag } from 'antd';
+import { Card, Typography, Space, Alert, Tag, Button, Dropdown, Menu, Grid } from 'antd';
 import RichTable from '@/components/Table/RichTable';
 import { ColumnsType } from 'antd/es/table';
+import { EditOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 
 interface UserData {
   id: string;
@@ -26,6 +28,7 @@ interface OrderData {
 
 const ListShowcasePage: React.FC = () => {
   const [selectedUserIds, setSelectedUserIds] = useState<React.Key[]>([]);
+  const screens = useBreakpoint();
 
   const fetchUsers = useCallback(async (params: any) => {
     const query = new URLSearchParams({
@@ -100,6 +103,7 @@ const ListShowcasePage: React.FC = () => {
       key: 'age',
       sorter: true,
       width: 80,
+      responsive: ['md'], // 在中等屏幕及以上显示
     },
     {
       title: '邮箱',
@@ -107,6 +111,7 @@ const ListShowcasePage: React.FC = () => {
       key: 'email',
       sorter: true,
       width: 200,
+      responsive: ['lg'], // 在大屏幕及以上显示
     },
     {
       title: '状态',
@@ -131,15 +136,32 @@ const ListShowcasePage: React.FC = () => {
       sorter: true,
       width: 180,
       render: (date: string) => new Date(date).toLocaleString(),
+      responsive: ['lg'], // 在大屏幕及以上显示
     },
     {
       title: '操作',
       key: 'actions',
       width: 100,
+      fixed: 'right',
       render: (_, record) => (
-        <Space size="middle">
-          <a>编辑</a>
-          <a>删除</a>
+        <Space size="small">
+          <Button icon={<EditOutlined />} size="small">编辑</Button>
+          {screens.md ? (
+            <Button danger icon={<DeleteOutlined />} size="small">删除</Button>
+          ) : (
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item key="delete" icon={<DeleteOutlined />} danger>
+                    删除
+                  </Menu.Item>
+                </Menu>
+              }
+              trigger={['click']}
+            >
+              <Button icon={<MoreOutlined />} size="small" />
+            </Dropdown>
+          )}
         </Space>
       ),
     },
@@ -159,6 +181,7 @@ const ListShowcasePage: React.FC = () => {
       key: 'userId',
       sorter: true,
       width: 120,
+      responsive: ['md'], // 在中等屏幕及以上显示
     },
     {
       title: '产品',
@@ -174,6 +197,7 @@ const ListShowcasePage: React.FC = () => {
       sorter: true,
       width: 100,
       render: (amount: number) => `¥${amount.toFixed(2)}`,
+      responsive: ['md'], // 在中等屏幕及以上显示
     },
     {
       title: '订单日期',
@@ -182,6 +206,7 @@ const ListShowcasePage: React.FC = () => {
       sorter: true,
       width: 180,
       render: (date: string) => new Date(date).toLocaleString(),
+      responsive: ['lg'], // 在大屏幕及以上显示
     },
   ];
 

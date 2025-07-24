@@ -133,12 +133,12 @@ function RichTable<T extends object>({
 
   return (
     <div className="rich-table-container">
-      <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }}>
-        <Space>
+      <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }} direction={screens.md ? 'horizontal' : 'vertical'}>
+        <Space direction={screens.md ? 'horizontal' : 'vertical'}>
           <Search
             placeholder={searchPlaceholder}
             onSearch={handleSearch}
-            style={{ width: 200 }}
+            style={{ width: screens.md ? 200 : '100%' }}
             allowClear
             defaultValue={initialSearch}
           />
@@ -146,7 +146,7 @@ function RichTable<T extends object>({
             <Select
               key={filter.key}
               defaultValue="all"
-              style={{ width: 120 }}
+              style={{ width: screens.md ? 120 : '100%' }}
               onChange={(value) => handleFilterChange(filter.key, value)}
             >
               <Option value="all">{`所有${filter.label}`}</Option>

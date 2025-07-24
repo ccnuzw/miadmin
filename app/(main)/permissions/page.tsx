@@ -1,29 +1,26 @@
 'use client';
 import React, { useState } from 'react';
-import { Table, Input, Space, Typography } from 'antd';
+import { Table, Input, Space, Typography, Grid, Button, Dropdown, Menu } from 'antd';
 import type { TableProps } from 'antd';
 import { Permission } from '@/lib/types';
+import GeneralTable from '@/components/Table/GeneralTable'; // 导入 GeneralTable
+import { EditOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons'; // 导入操作图标
 
 const { Search } = Input;
 const { Title } = Typography;
+const { useBreakpoint } = Grid;
 
-const dummyPermissions: Permission[] = [
-  { id: '1', name: '用户列表查看', description: '允许查看用户列表', code: 'user:list', module: '用户管理', type: '功能权限' },
-  { id: '2', name: '用户新增', description: '允许新增用户', code: 'user:add', module: '用户管理', type: '功能权限' },
-  { id: '3', name: '用户编辑', description: '允许编辑用户', code: 'user:edit', module: '用户管理', type: '功能权限' },
-  { id: '4', name: '用户删除', description: '允许删除用户', code: 'user:delete', module: '用户管理', type: '功能权限' },
-  { id: '5', name: '角色列表查看', description: '允许查看角色列表', code: 'role:list', module: '角色管理', type: '功能权限' },
-  { id: '6', name: '角色新增', description: '允许新增角色', code: 'role:add', module: '角色管理', type: '功能权限' },
-  { id: '7', name: '角色编辑', description: '允许编辑角色', code: 'role:edit', module: '角色管理', type: '功能权限' },
-  { id: '8', name: '角色删除', description: '允许删除角色', code: 'role:delete', module: '角色管理', type: '功能权限' },
-  { id: '9', name: '权限列表查看', description: '允许查看权限列表', code: 'permission:list', module: '权限管理', type: '功能权限' },
-  { id: '10', name: '仪表盘访问', description: '允许访问仪表盘', code: 'dashboard:view', module: '仪表盘', type: '菜单权限' },
-  { id: '11', name: '系统设置访问', description: '允许访问系统设置', code: 'settings:view', module: '系统设置', type: '菜单权限' },
-  { id: '12', name: '新仪表盘访问', description: '允许访问新仪表盘', code: 'new-dashboard:view', module: '新仪表盘', type: '菜单权限' },
-  { id: '13', name: '组件展示访问', description: '允许访问组件展示', code: 'component-showcase:view', module: '组件展示', type: '菜单权限' },
-];
+const dummyPermissions: Permission[] = Array.from({ length: 30 }, (_, i) => ({
+  id: `${i + 1}`,
+  name: `权限名称 ${i + 1}`,
+  description: `这是权限 ${i + 1} 的详细描述，用于测试响应式布局。`,
+  code: `perm:code:${i + 1}`,
+  module: ['用户管理', '角色管理', '权限管理', '仪表盘', '系统设置'][i % 5],
+  type: i % 2 === 0 ? '功能权限' : '菜单权限',
+}));
 
 const PermissionsPage: React.FC = () => {
+  const screens = useBreakpoint();
   const [permissions, setPermissions] = useState<Permission[]>(dummyPermissions);
   const [searchText, setSearchText] = useState<string>('');
 
@@ -38,38 +35,46 @@ const PermissionsPage: React.FC = () => {
     setPermissions(filtered);
   };
 
+  const handleEdit = (id: string) => {
+    // 实际编辑逻辑
+    console.log('编辑权限:', id);
+  };
+
+  const handleDelete = (id: string) => {
+    // 实际删除逻辑
+    console.log('删除权限:', id);
+  };
+
   const columns: TableProps<Permission>['columns'] = [
     {
       title: '权限名称',
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
+      width: 150,
     },
     {
       title: '权限编码',
       dataIndex: 'code',
       key: 'code',
       sorter: (a, b) => a.code.localeCompare(b.code),
+      width: 150,
+      responsive: ['md'], // 在中等屏幕及以上显示
     },
     {
       title: '所属模块',
       dataIndex: 'module',
       key: 'module',
-      filters: [
-        { text: '用户管理', value: '用户管理' },
-        { text: '角色管理', value: '角色管理' },
-        { text: '权限管理', value: '权限管理' },
-        { text: '仪表盘', value: '仪表盘' },
-        { text: '新仪表盘', value: '新仪表盘' },
-        { text: '组件展示', value: '组件展示' },
-        { text: '系统设置', value: '系统设置' },
-      ],
+      width: 120,
+      filters: Array.from(new Set(dummyPermissions.map(p => p.module))).map(module => ({ text: module, value: module })),
       onFilter: (value, record) => record.module.includes(value as string),
     },
     {
       title: '权限类型',
       dataIndex: 'type',
       key: 'type',
+      width: 120,
+      responsive: ['md'], // 在中等屏幕及以上显示
       filters: [
         { text: '菜单权限', value: '菜单权限' },
         { text: '功能权限', value: '功能权限' },
@@ -80,21 +85,52 @@ const PermissionsPage: React.FC = () => {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
+      width: 250,
+      responsive: ['lg'], // 在大屏幕及以上显示
+    },
+    {
+      title: '操作',
+      key: 'action',
+      width: 100,
+      fixed: 'right',
+      render: (_, record) => (
+        <Space size="small">
+          {screens.md ? (
+            <>
+              <Button icon={<EditOutlined />} onClick={() => handleEdit(record.id)} size="small">编辑</Button>
+              <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)} size="small">删除</Button>
+            </>
+          ) : (
+            <Dropdown
+              menu={{
+                items: [
+                  { key: 'edit', icon: <EditOutlined />, label: '编辑', onClick: () => handleEdit(record.id) },
+                  { key: 'delete', icon: <DeleteOutlined />, label: '删除', danger: true, onClick: () => handleDelete(record.id) },
+                ],
+              }}
+              trigger={['click']}
+            >
+              <Button icon={<MoreOutlined />} size="small" />
+            </Dropdown>
+          )}
+        </Space>
+      ),
     },
   ];
 
   return (
     <div>
       <Title level={2}>权限管理</Title>
-      <Space style={{ marginBottom: 16 }}>
+      <Space style={{ marginBottom: 16, width: '100%' }}>
         <Search
           placeholder="搜索权限名称、编码或描述"
           onSearch={handleSearch}
-          style={{ width: 300 }}
+          style={{ width: screens.md ? 300 : '100%' }} // 宽度自适应
           allowClear
+          value={searchText}
         />
       </Space>
-      <Table columns={columns} dataSource={permissions} rowKey="id" pagination={{ pageSize: 10 }} />
+      <GeneralTable columns={columns} dataSource={permissions} rowKey="id" pagination={{ pageSize: 10 }} />
     </div>
   );
 };
