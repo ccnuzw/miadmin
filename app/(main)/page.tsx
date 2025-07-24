@@ -1,6 +1,6 @@
 'use client';
-import React from 'react';
-import { Card, Col, Row, Statistic, Typography, List, Button, Space } from 'antd';
+import { Card, Col, Row, Statistic, Typography, List, Button, Space, Segmented, Tabs } from 'antd';
+import React, { useState } from 'react';
 import { ArrowUpOutlined, ArrowDownOutlined, UserOutlined, PlusOutlined, SolutionOutlined, TeamOutlined, SafetyOutlined, SettingOutlined } from '@ant-design/icons';
 import { Line, Pie, Column } from '@ant-design/charts';
 import Link from 'next/link';
@@ -9,10 +9,12 @@ const { Title } = Typography;
 
 const DashboardPage: React.FC = () => {
   const [isClient, setIsClient] = React.useState(false);
+  const [activeTabKey, setActiveTabKey] = useState('1'); // 用于控制 Segmented 的选中状态
 
   React.useEffect(() => {
     setIsClient(true);
   }, []);
+
   // Dummy data for charts
   const userData = [
     { year: '2023-01', value: 300 },
@@ -96,6 +98,12 @@ const DashboardPage: React.FC = () => {
     { id: 4, user: 'Admin', action: '删除旧数据', time: '2023-07-20 10:15:30' },
   ];
 
+  const tabContent = {
+    '1': <p>这是 Tab 1 的内容。</p>,
+    '2': <p>这是 Tab 2 的内容。</p>,
+    '3': <p>这是 Tab 3 的内容。</p>,
+  };
+
   return (
     <div>
       <Title level={2}>仪表盘</Title>
@@ -164,9 +172,27 @@ const DashboardPage: React.FC = () => {
       </Row>
 
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24}>
+        <Col xs={24} md={12}>
           <Card title="操作类型统计">
             {isClient && <Column {...operationTypeConfig} />}
+          </Card>
+        </Col>
+        <Col xs={24} md={12}>
+          <Card
+            title="多页卡片示例"
+            extra={
+              <Segmented
+                options={[
+                  { label: 'Tab 1', value: '1' },
+                  { label: 'Tab 2', value: '2' },
+                  { label: 'Tab 3', value: '3' },
+                ]}
+                value={activeTabKey}
+                onChange={(value) => setActiveTabKey(value as string)}
+              />
+            }
+          >
+            {tabContent[activeTabKey]}
           </Card>
         </Col>
       </Row>
