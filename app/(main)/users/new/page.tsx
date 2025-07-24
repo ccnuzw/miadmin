@@ -1,7 +1,8 @@
 'use client';
 import React, { useState } from 'react';
-import { Form, Input, Button, Select, Space, Card, message, Typography } from 'antd';
+import { Form, Input, Button, Select, Space, Card, message, Typography, TreeSelect } from 'antd';
 import { useRouter } from 'next/navigation';
+import { MOCK_ORGANIZATION_STRUCTURE_TREE_DATA, OrgTreeNode } from '@/lib/constants';
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -9,10 +10,30 @@ const { Title } = Typography;
 // Dummy data for roles
 const dummyRoles = ['管理员', '编辑', '普通用户', '访客'];
 
+// Helper function to get all organization nodes (orgUnits and departments) for TreeSelect
+const getOrganizationTreeData = (nodes: OrgTreeNode[]) => {
+  return nodes.map(node => {
+    const treeNode: any = {
+      key: node.key,
+      value: node.key,
+      title: node.title,
+      // All nodes (orgUnits and departments) are now selectable
+    };
+
+    if (node.children && node.children.length > 0) {
+      treeNode.children = getOrganizationTreeData(node.children);
+    }
+
+    return treeNode;
+  });
+};
+
 const NewUserPage: React.FC = () => {
   const router = useRouter();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+
+  const organizationTreeData = getOrganizationTreeData(MOCK_ORGANIZATION_STRUCTURE_TREE_DATA);
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -74,6 +95,18 @@ const NewUserPage: React.FC = () => {
                 <Option key={role} value={role}>{role}</Option>
               ))}
             </Select>
+          </Form.Item>
+          <Form.Item label="所属部门" name="departmentIds">
+            <TreeSelect
+              showSearch
+              style={{ width: '100%' }}
+              styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
+              treeData={organizationTreeData}
+              placeholder="请选择所属部门"
+              treeDefaultExpandAll
+              multiple
+              treeNodeFilterProp="title"
+            />
           </Form.Item>
 
           <Form.Item>

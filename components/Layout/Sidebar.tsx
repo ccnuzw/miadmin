@@ -1,15 +1,18 @@
 import React from 'react';
 import { Layout, Menu } from 'antd';
-import { 
+import {
   UserOutlined,
   SettingOutlined,
   DashboardOutlined,
   TeamOutlined,
   SafetyOutlined,
   NotificationOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  DeploymentUnitOutlined, // Import new icon
+  BlockOutlined, // Import new icon
 } from '@ant-design/icons';
 import Link from 'next/link';
+import { MOCK_MENU_PERMISSIONS, MenuItem } from '@/lib/constants';
 
 const { Sider } = Layout;
 
@@ -18,7 +21,44 @@ interface SidebarProps {
   onCollapse?: (collapsed: boolean) => void;
 }
 
+// Map icon names to Ant Design Icon components
+const iconMap: { [key: string]: React.ReactNode } = {
+  DashboardOutlined: <DashboardOutlined />,
+  UserOutlined: <UserOutlined />,
+  TeamOutlined: <TeamOutlined />,
+  SafetyOutlined: <SafetyOutlined />,
+  SettingOutlined: <SettingOutlined />,
+  NotificationOutlined: <NotificationOutlined />,
+  FileTextOutlined: <FileTextOutlined />,
+  DeploymentUnitOutlined: <DeploymentUnitOutlined />,
+  BlockOutlined: <BlockOutlined />,
+};
+
+// Function to transform mock menu data to Ant Design Menu items
+const getMenuItems = (menuData: MenuItem[]) => {
+  return menuData.map(item => {
+    if (item.hidden) return null; // Skip hidden items
+
+    if (item.children && item.children.length > 0) {
+      return {
+        key: item.key,
+        icon: item.icon ? iconMap[item.icon] : null,
+        label: item.label,
+        children: getMenuItems(item.children),
+      };
+    } else {
+      return {
+        key: item.key,
+        icon: item.icon ? iconMap[item.icon] : null,
+        label: <Link href={item.path}>{item.label}</Link>,
+      };
+    }
+  }).filter(Boolean); // Filter out nulls from hidden items
+};
+
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
+  const menuItems = getMenuItems(MOCK_MENU_PERMISSIONS);
+
   return (
     <Sider
       trigger={null}
@@ -40,86 +80,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
       <Menu
         theme="light"
         mode="inline"
-        defaultSelectedKeys={['1']}
-        items={[
-          {
-            key: '1',
-            icon: <DashboardOutlined />,
-            label: <Link href="/">仪表盘</Link>,
-          },
-          {
-            key: 'new-dashboard',
-            icon: <DashboardOutlined />,
-            label: <Link href="/new-dashboard">新仪表盘</Link>,
-          },
-          {
-            key: 'component-showcase',
-            icon: <DashboardOutlined />,
-            label: <Link href="/component-showcase">组件展示</Link>,
-          },
-          {
-            key: 'list-showcase',
-            icon: <FileTextOutlined />,
-            label: <Link href="/list-showcase">列表展示</Link>,
-          },
-          {
-            key: 'sub1',
-            icon: <UserOutlined />,
-            label: '用户管理',
-            children: [
-              {
-                key: '2',
-                label: <Link href="/users">用户列表</Link>,
-              },
-              {
-                key: '3',
-                label: <Link href="/users/new">新增用户</Link>,
-              },
-            ],
-          },
-          {
-            key: 'sub2',
-            icon: <TeamOutlined />,
-            label: '角色管理',
-            children: [
-              {
-                key: '4',
-                label: <Link href="/roles">角色列表</Link>,
-              },
-              {
-                key: '5',
-                label: <Link href="/roles/new">新增角色</Link>,
-              },
-            ],
-          },
-          {
-            key: '6',
-            icon: <SafetyOutlined />,
-            label: <Link href="/permissions">权限管理</Link>,
-          },
-          {
-            key: 'sub3',
-            icon: <SettingOutlined />,
-            label: '系统设置',
-            children: [
-              {
-                key: '7',
-                label: <Link href="/settings">通用设置</Link>,
-              },
-              {
-                key: '8',
-                label: <Link href="/settings/notifications">通知设置</Link>,
-              },
-              {
-                key: '9',
-                label: <Link href="/settings/logs">日志管理</Link>,
-              },
-            ],
-          },
-        ]}
+        defaultSelectedKeys={['dashboard']} // Set default selected key to dashboard
+        items={menuItems}
       />
     </Sider>
   );
 };
 
 export default Sidebar;
+

@@ -1,20 +1,40 @@
 'use client';
+'use client';
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Switch, Space, Card, message, Typography } from 'antd';
+import { Form, Input, Button, Select, Switch, Space, Card, message, Typography, TreeSelect } from 'antd';
 import { useRouter } from 'next/navigation';
 import { User } from '@/lib/types';
+import { MOCK_ORGANIZATION_STRUCTURE_TREE_DATA, OrgTreeNode } from '@/lib/constants';
 
 const { Option } = Select;
 const { Title } = Typography;
 
 // Dummy data for users and roles
 const dummyUsers: User[] = [
-  { id: '1', username: 'admin', email: 'admin@example.com', roles: ['管理员'], phone: '13800138000', status: true },
-  { id: '2', username: 'user1', email: 'user1@example.com', roles: ['普通用户'], phone: '13912345678', status: true },
-  { id: '3', username: 'editor1', email: 'editor1@example.com', roles: ['编辑'], phone: '13787654321', status: false },
+  { id: '1', username: 'admin', email: 'admin@example.com', roles: ['管理员'], phone: '13800138000', status: true, departmentIds: ['dept-hq-finance'] },
+  { id: '2', username: 'user1', email: 'user1@example.com', roles: ['普通用户'], phone: '13912345678', status: true, departmentIds: ['dept-bj-sales'] },
+  { id: '3', username: 'editor1', email: 'editor1@example.com', roles: ['编辑'], phone: '13787654321', status: false, departmentIds: ['dept-north-rd-fe'] },
 ];
 
 const dummyRoles = ['管理员', '编辑', '普通用户', '访客'];
+
+// Helper function to get all organization nodes (orgUnits and departments) for TreeSelect
+const getOrganizationTreeData = (nodes: OrgTreeNode[]) => {
+  return nodes.map(node => {
+    const treeNode: any = {
+      key: node.key,
+      value: node.key,
+      title: node.title,
+      // All nodes (orgUnits and departments) are now selectable
+    };
+
+    if (node.children && node.children.length > 0) {
+      treeNode.children = getOrganizationTreeData(node.children);
+    }
+
+    return treeNode;
+  });
+};
 
 const UserDetailPage: React.FC<{ params: { id: string } }> = ({ params }) => {
   const router = useRouter();
@@ -24,12 +44,15 @@ const UserDetailPage: React.FC<{ params: { id: string } }> = ({ params }) => {
 
   const userId = React.use(params).id; // Get ID from URL params
 
+  const organizationTreeData = getOrganizationTreeData(MOCK_ORGANIZATION_STRUCTURE_TREE_DATA);
+
   useEffect(() => {
     if (userId) {
       // In a real application, fetch user data from API
       const user = dummyUsers.find(u => u.id === userId);
       if (user) {
         setCurrentUser(user);
+        form.setFieldsValue({ ...user, departmentIds: user.departmentIds || [] });
       } else {
         message.error('用户未找到！');
         router.push('/users');
@@ -94,6 +117,18 @@ const UserDetailPage: React.FC<{ params: { id: string } }> = ({ params }) => {
                 <Option key={role} value={role}>{role}</Option>
               ))}
             </Select>
+          </Form.Item>
+          <Form.Item label="所属部门" name="departmentIds">
+            <TreeSelect
+              showSearch
+              style={{ width: '100%' }}
+              styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
+              treeData={organizationTreeData}
+              placeholder="请选择所属部门"
+              treeDefaultExpandAll
+              multiple
+              treeNodeFilterProp="title"
+            />
           </Form.Item>
           <Form.Item label="状态" name="status" valuePropName="checked">
             <Switch checkedChildren="启用" unCheckedChildren="禁用" />
