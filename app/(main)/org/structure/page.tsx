@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Layout, Card, Table, Button, Space, Modal, Form, Input, Select, Tag, Tree } from 'antd';
+import { useRouter } from 'next/navigation';
+import { Layout, Card, Table, Button, Space, Modal, Form, Input, Select, Tag, Tree, message } from 'antd';
+const { Option } = Select;
 import {
   DeploymentUnitOutlined,
   BlockOutlined,
@@ -20,8 +22,11 @@ const { Sider, Content } = Layout;
 const { confirm } = Modal;
 
 const OrganizationStructurePage: React.FC = () => {
+  const router = useRouter();
   const [selectedNode, setSelectedNode] = useState<OrgTreeNode | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAddMemberModalVisible, setIsAddMemberModalVisible] = useState(false);
+  const [selectedUsersToAdd, setSelectedUsersToAdd] = useState<string[]>([]); // Stores user IDs to add
   const [form] = Form.useForm();
   const [modalType, setModalType] = useState<'add' | 'edit' | 'add-child-org' | 'add-department' | 'add-sub-department' | ''>('');
 
@@ -103,13 +108,35 @@ const OrganizationStructurePage: React.FC = () => {
   };
 
   const handleAddMember = () => {
-    if (selectedNode && selectedNode.type === 'department') {
-      Modal.info({
-        title: '添加成员',
-        content: `为部门 "${selectedNode.title}" 添加成员的逻辑`,
-        // Here you would open a user selection modal
-      });
+    if (selectedNode && (selectedNode.type === 'department' || selectedNode.type === 'orgUnit')) {
+      setIsAddMemberModalVisible(true);
+      setSelectedUsersToAdd([]); // Clear previous selections
     }
+  };
+
+  const handleAddMemberOk = () => {
+    if (selectedNode && selectedUsersToAdd.length > 0) {
+      // Simulate adding members to the MOCK_ORGANIZATION_MEMBERS
+      // In a real app, you'd send this to your API
+      const currentMembers = MOCK_ORGANIZATION_MEMBERS[selectedNode.key] || [];
+      const newMembers = selectedUsersToAdd.map(userId => {
+        // Find user details from a mock user list or fetch from API
+        // For now, just create a dummy member object
+        return { userId, username: `用户${userId}`, employeeId: `E${userId}`, contact: `138${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`, assignedRoleNames: ['成员'] };
+      });
+
+      MOCK_ORGANIZATION_MEMBERS[selectedNode.key] = [...currentMembers, ...newMembers];
+      message.success(`成功添加 ${selectedUsersToAdd.length} 位成员到 ${selectedNode.title}`);
+      setIsAddMemberModalVisible(false);
+      setSelectedUsersToAdd([]);
+    } else {
+      message.warning('请选择要添加的成员！');
+    }
+  };
+
+  const handleAddMemberCancel = () => {
+    setIsAddMemberModalVisible(false);
+    setSelectedUsersToAdd([]);
   };
 
   const handleRemoveMember = (member: DepartmentMember) => {
@@ -199,7 +226,7 @@ const OrganizationStructurePage: React.FC = () => {
       key: 'actions',
       render: (text: string, record: DepartmentMember) => (
         <Space size="middle">
-          <Button type="link" onClick={() => console.log('View user detail', record.userId)}>查看用户详情</Button>
+          <Button type="link" onClick={() => router.push(`/users/${record.userId}`)}>详细信息</Button>
           <Button type="link" danger onClick={() => handleRemoveMember(record)}>移除</Button>
         </Space>
       ),
@@ -281,6 +308,33 @@ const OrganizationStructurePage: React.FC = () => {
           destroyOnHidden
         >
           <OrgUnitOrDepartmentForm form={form} modalType={modalType} selectedNode={selectedNode} />
+        </Modal>
+
+        <Modal
+          title={`为 ${selectedNode?.title} 添加成员`}
+          open={isAddMemberModalVisible}
+          onOk={handleAddMemberOk}
+          onCancel={handleAddMemberCancel}
+          okText="确定"
+          cancelText="取消"
+        >
+          <Form layout="vertical">
+            <Form.Item label="选择成员">
+              <Select
+                mode="multiple"
+                placeholder="请选择要添加的成员"
+                value={selectedUsersToAdd}
+                onChange={setSelectedUsersToAdd}
+                style={{ width: '100%' }}
+              >
+                {/* Dummy user options - replace with actual user data from API */}
+                <Option value="dummy-user-1">张三</Option>
+                <Option value="dummy-user-2">李四</Option>
+                <Option value="dummy-user-3">王五</Option>
+                <Option value="dummy-user-4">赵六</Option>
+              </Select>
+            </Form.Item>
+          </Form>
         </Modal>
       </Content>
     </Layout>

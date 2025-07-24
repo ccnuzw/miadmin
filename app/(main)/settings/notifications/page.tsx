@@ -45,19 +45,29 @@ const NotificationsPage: React.FC = () => {
   const screens = useBreakpoint();
   const [templates, setTemplates] = useState<NotificationTemplate[]>(dummyTemplates);
   const [policies, setPolicies] = useState<NotificationPolicy[]>(dummyPolicies);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isTemplateModalVisible, setIsTemplateModalVisible] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<NotificationTemplate | null>(null);
-  const [form] = Form.useForm();
+  const [templateForm] = Form.useForm();
 
-  const showModal = (template?: NotificationTemplate) => {
+  const [isPolicyModalVisible, setIsPolicyModalVisible] = useState(false);
+  const [editingPolicy, setEditingPolicy] = useState<NotificationPolicy | null>(null);
+  const [policyForm] = Form.useForm();
+
+  const showTemplateModal = (template?: NotificationTemplate) => {
     setEditingTemplate(template || null);
-    form.setFieldsValue(template || { type: '邮件' });
-    setIsModalVisible(true);
+    templateForm.setFieldsValue(template || { type: '邮件' });
+    setIsTemplateModalVisible(true);
   };
 
-  const handleOk = async () => {
+  const showPolicyModal = (policy?: NotificationPolicy) => {
+    setEditingPolicy(policy || null);
+    policyForm.setFieldsValue(policy || { enabled: true });
+    setIsPolicyModalVisible(true);
+  };
+
+  const handleTemplateOk = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await templateForm.validateFields();
       if (editingTemplate) {
         // Edit existing template
         setTemplates(templates.map(t => (t.id === editingTemplate.id ? { ...t, ...values } : t)));
@@ -68,17 +78,43 @@ const NotificationsPage: React.FC = () => {
         setTemplates([...templates, { id: newId, ...values }]);
         message.success('模板添加成功！');
       }
-      setIsModalVisible(false);
-      form.resetFields();
+      setIsTemplateModalVisible(false);
+      templateForm.resetFields();
     } catch (errorInfo) {
       console.log('Failed:', errorInfo);
       message.error('请检查表单填写！');
     }
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    form.resetFields();
+  const handleTemplateCancel = () => {
+    setIsTemplateModalVisible(false);
+    templateForm.resetFields();
+  };
+
+  const handlePolicyOk = async () => {
+    try {
+      const values = await policyForm.validateFields();
+      if (editingPolicy) {
+        // Edit existing policy
+        setPolicies(policies.map(p => (p.id === editingPolicy.id ? { ...p, ...values } : p)));
+        message.success('策略更新成功！');
+      } else {
+        // This case is not expected for policy editing, but good to have
+        const newId = String(policies.length + 1);
+        setPolicies([...policies, { id: newId, ...values }]);
+        message.success('策略添加成功！');
+      }
+      setIsPolicyModalVisible(false);
+      policyForm.resetFields();
+    } catch (errorInfo) {
+      console.log('Failed:', errorInfo);
+      message.error('请检查表单填写！');
+    }
+  };
+
+  const handlePolicyCancel = () => {
+    setIsPolicyModalVisible(false);
+    policyForm.resetFields();
   };
 
   const handleDeleteTemplate = (id: string) => {
@@ -136,18 +172,26 @@ const NotificationsPage: React.FC = () => {
       fixed: 'right',
       render: (_: any, record: NotificationTemplate) => (
         <Space size="small">
-          <Button icon={<EditOutlined />} onClick={() => showModal(record)} size="small">编辑</Button>
+          <Button icon={<EditOutlined />} onClick={() => showTemplateModal(record)} size="small">编辑</Button>
           {screens.md ? (
             <Button danger icon={<DeleteOutlined />} onClick={() => handleDeleteTemplate(record.id)} size="small">删除</Button>
           ) : (
             <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item key="delete" icon={<DeleteOutlined />} danger onClick={() => handleDeleteTemplate(record.id)}>
-                    删除
-                  </Menu.Item>
-                </Menu>
-              }
+              menu={{
+                items: [
+                  {
+                    key: 'delete',
+                    label: (
+                      <Space>
+                        <DeleteOutlined />
+                        删除
+                      </Space>
+                    ),
+                    danger: true,
+                    onClick: () => handleDeleteTemplate(record.id),
+                  },
+                ],
+              }}
               trigger={['click']}
             >
               <Button icon={<MoreOutlined />} size="small" />
@@ -194,16 +238,23 @@ const NotificationsPage: React.FC = () => {
       render: (_: any, record: NotificationPolicy) => (
         <Space size="small">
           {screens.md ? (
-            <Button icon={<EditOutlined />} onClick={() => { /* 编辑策略逻辑 */ }} size="small">编辑</Button>
+            <Button icon={<EditOutlined />} onClick={() => showPolicyModal(record)} size="small">编辑</Button>
           ) : (
             <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => { /* 编辑策略逻辑 */ }}>
-                    编辑
-                  </Menu.Item>
-                </Menu>
-              }
+              menu={{
+                items: [
+                  {
+                    key: 'edit',
+                    label: (
+                      <Space>
+                        <EditOutlined />
+                        编辑
+                      </Space>
+                    ),
+                    onClick: () => showPolicyModal(record),
+                  },
+                ],
+              }}
               trigger={['click']}
             >
               <Button icon={<MoreOutlined />} size="small" />
@@ -228,17 +279,15 @@ const NotificationsPage: React.FC = () => {
 
       <Modal
         title={editingTemplate ? '编辑通知模板' : '新增通知模板'}
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        open={isTemplateModalVisible}
+        onOk={handleTemplateOk}
+        onCancel={handleTemplateCancel}
         okText="确定"
         cancelText="取消"
         confirmLoading={false}
-        // 模态框内部表单的响应式由 GeneralForm 负责，这里直接使用 Form
-        // 确保在小屏幕下，模态框内容不会溢出
-        width={screens.md ? 600 : '90%'} // 模态框宽度自适应
+        width={screens.md ? 600 : '90%'}
       >
-        <Form form={form} layout={screens.md ? 'horizontal' : 'vertical'}>
+        <Form form={templateForm} layout={screens.md ? 'horizontal' : 'vertical'}>
           <Form.Item name="name" label="模板名称" rules={[{ required: true, message: '请输入模板名称!' }]}>
             <Input />
           </Form.Item>
@@ -254,6 +303,29 @@ const NotificationsPage: React.FC = () => {
           </Form.Item>
           <Form.Item name="content" label="内容" rules={[{ required: true, message: '请输入内容!' }]}>
             <TextArea rows={4} />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title={editingPolicy ? '编辑通知策略' : '新增通知策略'}
+        open={isPolicyModalVisible}
+        onOk={handlePolicyOk}
+        onCancel={handlePolicyCancel}
+        okText="确定"
+        cancelText="取消"
+        confirmLoading={false}
+        width={screens.md ? 600 : '90%'}
+      >
+        <Form form={policyForm} layout={screens.md ? 'horizontal' : 'vertical'}>
+          <Form.Item name="name" label="策略名称" rules={[{ required: true, message: '请输入策略名称!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="description" label="描述">
+            <TextArea rows={2} />
+          </Form.Item>
+          <Form.Item name="enabled" label="启用" valuePropName="checked">
+            <Switch checkedChildren="启用" unCheckedChildren="禁用" />
           </Form.Item>
         </Form>
       </Modal>

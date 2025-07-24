@@ -4,9 +4,9 @@ import { Breadcrumb } from 'antd';
 import { usePathname } from 'next/navigation';
 
 const pathNameMap: { [key: string]: string } = {
-  dashboard: '仪表盘',
+  dashboard: '仪表盘展示',
   users: '用户管理',
-  roles: '角色管理',
+  roles: '角色列表',
   permissions: '权限管理',
   settings: '系统设置',
   logs: '日志管理',
@@ -14,6 +14,9 @@ const pathNameMap: { [key: string]: string } = {
   'new-dashboard': '新仪表盘',
   new: '新增',
   'component-showcase': '组件展示',
+  'list-showcase': '列表展示',
+  org: '组织架构',
+  structure: '组织结构管理',
   // Add more mappings as needed
 };
 

@@ -150,13 +150,20 @@ const ListShowcasePage: React.FC = () => {
             <Button danger icon={<DeleteOutlined />} size="small">删除</Button>
           ) : (
             <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item key="delete" icon={<DeleteOutlined />} danger>
-                    删除
-                  </Menu.Item>
-                </Menu>
-              }
+              menu={{
+                items: [
+                  {
+                    key: 'delete',
+                    label: (
+                      <Space>
+                        <DeleteOutlined />
+                        删除
+                      </Space>
+                    ),
+                    danger: true,
+                  },
+                ],
+              }}
               trigger={['click']}
             >
               <Button icon={<MoreOutlined />} size="small" />

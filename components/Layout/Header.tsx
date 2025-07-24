@@ -63,7 +63,21 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
       </div>
       <div style={{ marginRight: 24 }}>
         <Space size="middle">
-          <BellOutlined style={{ fontSize: '18px' }} />
+          <Dropdown
+            menu={{
+              items: [
+                { key: '1', label: '您有新的消息' },
+                { key: '2', label: '系统更新通知' },
+                { key: '3', label: '查看所有通知' },
+              ],
+            }}
+            trigger={['click']}
+            placement="bottomRight"
+          >
+            <a onClick={(e) => e.preventDefault()}>
+              <BellOutlined style={{ fontSize: '18px' }} />
+            </a>
+          </Dropdown>
           <Dropdown menu={{ items }} placement="bottomRight">
             <a onClick={(e) => e.preventDefault()}>
               <Space>

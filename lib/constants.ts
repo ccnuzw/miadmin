@@ -194,13 +194,13 @@ export const MOCK_ORGANIZATION_MEMBERS: { [orgUnitOrDeptKey: string]: Department
 
 // 菜单权限数据 (组织架构菜单，保持不变)
 export const MOCK_MENU_PERMISSIONS: MenuItem[] = [
+  { key: 'home', label: '首页', path: '/', icon: 'DashboardOutlined' },
   {
     key: 'dashboard_showcase',
     label: '仪表盘展示',
     path: '/dashboard',
     icon: 'DashboardOutlined',
     children: [
-      { key: 'dashboard', label: '首页', path: '/' },
       { key: 'new-dashboard', label: '新仪表盘', path: '/new-dashboard' },
       { key: 'component-showcase', label: '组件展示', path: '/component-showcase' },
       { key: 'list-showcase', label: '列表展示', path: '/list-showcase' },
@@ -210,16 +210,14 @@ export const MOCK_MENU_PERMISSIONS: MenuItem[] = [
     { key: 'user_list', label: '用户列表', path: '/users' },
     { key: 'user_detail', label: '用户详情', path: '/users/[id]', hidden: true },
     { key: 'user_add', label: '新增用户', path: '/users/new', hidden: true },
-  ]},
-  { key: 'role_management', label: '角色管理', path: '/roles', icon: 'TeamOutlined', children: [
     { key: 'role_list', label: '角色列表', path: '/roles' },
     { key: 'role_detail', label: '角色详情', path: '/roles/[id]', hidden: true },
     { key: 'role_add', label: '新增角色', path: '/roles/new', hidden: true },
+    { key: 'permission_management', label: '权限管理', path: '/permissions' },
   ]},
   { key: 'org_management', label: '组织架构', path: '/org/structure', icon: 'DeploymentUnitOutlined', children: [
     { key: 'org_structure', label: '组织结构管理', path: '/org/structure' },
   ]},
-  { key: 'permission_management', label: '权限管理', path: '/permissions', icon: 'SafetyOutlined' },
   { key: 'system_settings', label: '系统设置', path: '/settings', icon: 'SettingOutlined', children: [
     { key: 'general_settings', label: '通用设置', path: '/settings' },
     { key: 'notification_settings', label: '通知设置', path: '/settings/notifications' },
@@ -235,10 +233,10 @@ export const MOCK_FUNCTION_PERMISSIONS = [
   { code: 'user:delete', name: '用户管理-删除用户', module: '用户管理', type: '功能', description: '从系统中删除用户' },
   { code: 'user:reset_password', name: '用户管理-重置密码', module: '用户管理', type: '功能', description: '管理员重置用户密码' },
 
-  { code: 'role:list', name: '角色列表-查看', module: '角色管理', type: '功能', description: '查看角色列表' },
-  { code: 'role:add', name: '角色管理-新增角色', module: '角色管理', type: '功能', description: '创建新角色' },
-  { code: 'role:edit', name: '角色管理-编辑角色', module: '角色管理', type: '功能', description: '修改角色信息及权限' },
-  { code: 'role:delete', name: '角色管理-删除角色', module: '角色管理', type: '功能', description: '删除角色' },
+  { code: 'role:list', name: '角色列表-查看', module: '用户管理', type: '功能', description: '查看角色列表' },
+  { code: 'role:add', name: '角色管理-新增角色', module: '用户管理', type: '功能', description: '创建新角色' },
+  { code: 'role:edit', name: '角色管理-编辑角色', module: '用户管理', type: '功能', description: '修改角色信息及权限' },
+  { code: 'role:delete', name: '角色管理-删除角色', module: '用户管理', type: '功能', description: '删除角色' },
 
   { code: 'org:structure:list', name: '组织结构-查看', module: '组织架构', type: '功能', description: '查看组织部门结构树和部门详情' },
   { code: 'org:structure:add_org_unit', name: '组织结构-新增组织单元', module: '组织架构', type: '功能', description: '新增顶级或子级组织单元' },
@@ -248,7 +246,7 @@ export const MOCK_FUNCTION_PERMISSIONS = [
   { code: 'org:structure:member_add', name: '组织结构-添加成员', module: '组织架构', type: '功能', description: '将用户添加到部门' },
   { code: 'org:structure:member_remove', name: '组织结构-移除成员', module: '组织架构', type: '功能', description: '将用户从部门移除' },
 
-  { code: 'permission:list', name: '权限管理-查看权限点', module: '权限管理', type: '功能', description: '查看系统所有权限点的元数据' },
+  { code: 'permission:list', name: '权限管理-查看权限点', module: '用户管理', type: '功能', description: '查看系统所有权限点的元数据' },
 
   { code: 'setting:general', name: '系统设置-通用设置', module: '系统设置', type: '功能', description: '管理系统通用配置' },
   { code: 'setting:notification', name: '系统设置-通知设置', module: '系统设置', type: '功能', description: '管理通知模板和策略' },
@@ -258,13 +256,19 @@ export const MOCK_FUNCTION_PERMISSIONS = [
 // 面包屑路由映射 (保持不变)
 export const breadcrumbRoutesMap: { [key: string]: string } = {
   '/': '首页',
+  '/dashboard': '仪表盘展示',
+  '/new-dashboard': '新仪表盘',
+  '/component-showcase': '组件展示',
+  '/list-showcase': '列表展示',
   '/users': '用户管理',
+  '/users/[id]': '用户详情',
   '/users/new': '新增用户',
-  '/roles': '角色管理',
+  '/roles': '角色列表',
+  '/roles/[id]': '角色详情',
   '/roles/new': '新增角色',
+  '/permissions': '权限管理',
   '/org': '组织架构',
   '/org/structure': '组织结构管理',
-  '/permissions': '权限管理',
   '/settings': '系统设置',
   '/settings/notifications': '通知设置',
   '/settings/logs': '日志管理',
