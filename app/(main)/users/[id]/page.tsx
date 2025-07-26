@@ -91,64 +91,67 @@ const UserDetailPage: React.FC<{ params: { id: string } }> = ({ params }) => {
     return <div>加载中...</div>; // Or a loading spinner
   }
 
+  // Only render the form if currentUser is available
   return (
     <div>
       <Title level={2}>用户详情/编辑</Title>
-      <Card>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={currentUser}
-          key={currentUser?.id} // Add key to force remount when currentUser changes
-        >
-          <Form.Item label="用户名" name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="邮箱" name="email" rules={[{ required: true, type: 'email', message: '请输入有效邮箱!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="手机号" name="phone">
-            <Input />
-          </Form.Item>
-          <Form.Item label="角色" name="roles">
-            <Select mode="multiple" placeholder="选择角色">
-              {dummyRoles.map(role => (
-                <Option key={role} value={role}>{role}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item label="所属部门" name="departmentIds">
-            <TreeSelect
-              showSearch
-              style={{ width: '100%' }}
-              styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
-              treeData={organizationTreeData}
-              placeholder="请选择所属部门"
-              treeDefaultExpandAll
-              multiple
-              treeNodeFilterProp="title"
-            />
-          </Form.Item>
-          <Form.Item label="状态" name="status" valuePropName="checked">
-            <Switch checkedChildren="启用" unCheckedChildren="禁用" />
-          </Form.Item>
+      {currentUser && (
+        <Card>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            initialValues={currentUser}
+            key={currentUser?.id} // Add key to force remount when currentUser changes
+          >
+            <Form.Item label="用户名" name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item label="邮箱" name="email" rules={[{ required: true, type: 'email', message: '请输入有效邮箱!' }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item label="手机号" name="phone">
+              <Input />
+            </Form.Item>
+            <Form.Item label="角色" name="roles">
+              <Select mode="multiple" placeholder="选择角色">
+                {dummyRoles.map(role => (
+                  <Option key={role} value={role}>{role}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item label="所属部门" name="departmentIds">
+              <TreeSelect
+                showSearch
+                style={{ width: '100%' }}
+                styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
+                treeData={organizationTreeData}
+                placeholder="请选择所属部门"
+                treeDefaultExpandAll
+                multiple
+                treeNodeFilterProp="title"
+              />
+            </Form.Item>
+            <Form.Item label="状态" name="status" valuePropName="checked">
+              <Switch checkedChildren="启用" unCheckedChildren="禁用" />
+            </Form.Item>
 
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit" loading={loading}>
-                保存
-              </Button>
-              <Button onClick={() => router.push('/users')}>
-                取消
-              </Button>
-              <Button onClick={handleResetPassword} loading={loading}>
-                重置密码
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Card>
+            <Form.Item>
+              <Space>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  保存
+                </Button>
+                <Button onClick={() => router.push('/users')}>
+                  取消
+                </Button>
+                <Button onClick={handleResetPassword} loading={loading}>
+                  重置密码
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        </Card>
+      )}
     </div>
   );
 };
