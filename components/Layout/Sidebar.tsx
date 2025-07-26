@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu, Button } from 'antd';
+import { Layout, Menu, Button, theme } from 'antd';
 import {
   UserOutlined,
   SettingOutlined,
@@ -18,7 +18,7 @@ import {
 } from '@ant-design/icons';
 import Link from 'next/link';
 import { MOCK_MENU_PERMISSIONS, MenuItem } from '@/lib/constants';
-import { LayoutType } from '@/lib/theme-context';
+import { LayoutType, useTheme } from '@/lib/theme-context'; // 导入 useTheme
 
 const { Sider } = Layout;
 
@@ -58,7 +58,6 @@ const getMenuItems = (menuData: MenuItem[]) => {
         children: getMenuItems(item.children),
       };
     } else {
-      // 确保 item.path 是一个字符串，即使它是 undefined
       const linkHref = item.path || '#'; 
       return {
         key: item.key,
@@ -70,6 +69,9 @@ const getMenuItems = (menuData: MenuItem[]) => {
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, layout, selectedTopMenuKey }) => {
+  const { token: { colorBgContainer, colorText } } = theme.useToken(); // 获取 colorBgContainer 和 colorText
+  const { darkMode } = useTheme(); // 获取 darkMode 状态
+
   let currentMenuItems = MOCK_MENU_PERMISSIONS;
 
   if (layout === 'two-column' && selectedTopMenuKey) {
@@ -99,11 +101,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, layout, select
       }}
       width={200}
       collapsedWidth={80}
-      style={{ background: '#fff' }}
+      style={{ background: colorBgContainer }} // 使用动态背景色
     >
       <div className="demo-logo-vertical" style={{ height: 32, margin: 16, background: 'rgba(0,0,0,.02)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        {!siderCollapsed && <h1 style={{ color: '#000', fontSize: '18px', margin: 0 }}>MiAdmin</h1>}
-        {siderCollapsed && <BlockOutlined style={{ fontSize: '24px', color: '#000' }} />}
+        {!siderCollapsed && <h1 style={{ color: colorText, fontSize: '18px', margin: 0 }}>MiAdmin</h1>} {/* 使用 colorText */}
+        {siderCollapsed && <BlockOutlined style={{ fontSize: '24px', color: colorText }} />} {/* 使用 colorText */}
         {siderCollapsible && onCollapse && (
           <Button
             type="text"
@@ -114,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, layout, select
         )}
       </div>
       <Menu
-        theme="light"
+        theme={darkMode ? 'dark' : 'light'} // 根据 darkMode 动态设置主题
         mode="inline"
         defaultSelectedKeys={['dashboard']}
         items={menuItems}

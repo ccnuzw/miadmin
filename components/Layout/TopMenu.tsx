@@ -1,8 +1,7 @@
-
 "use client";
 
 import React from 'react';
-import { Menu } from 'antd';
+import { Menu, theme } from 'antd'; // 导入 theme
 import type { MenuProps } from 'antd';
 import Link from 'next/link';
 import {
@@ -15,9 +14,12 @@ import {
   FileTextOutlined,
   DeploymentUnitOutlined,
   BlockOutlined,
-} from '@ant-design/icons'; // 导入所有用到的图标
+  LineChartOutlined, // 新增导入
+  AppstoreOutlined, // 新增导入
+  TableOutlined, // 新增导入
+} from '@ant-design/icons';
 import { MenuItem } from '@/lib/constants';
-import { LayoutType } from '@/lib/theme-context';
+import { LayoutType, useTheme } from '@/lib/theme-context'; // 导入 useTheme
 
 interface TopMenuProps {
   menuData: MenuItem[];
@@ -31,10 +33,14 @@ const iconMap: { [key: string]: React.ReactNode } = {
   UserOutlined: <UserOutlined />,
   TeamOutlined: <TeamOutlined />,
   SafetyOutlined: <SafetyOutlined />,
+  SettingOutlined: <SettingOutlined />,
   NotificationOutlined: <NotificationOutlined />,
   FileTextOutlined: <FileTextOutlined />,
   DeploymentUnitOutlined: <DeploymentUnitOutlined />,
   BlockOutlined: <BlockOutlined />,
+  LineChartOutlined: <LineChartOutlined />,
+  AppstoreOutlined: <AppstoreOutlined />,
+  TableOutlined: <TableOutlined />,
 };
 
 // Helper function to transform menu data for Ant Design Menu
@@ -70,6 +76,9 @@ const getAntdMenuItems = (menuData: MenuItem[], isTopLevel: boolean = false): Me
 };
 
 const TopMenu: React.FC<TopMenuProps> = ({ menuData, layout, onSelectTopMenuItem }) => {
+  const { darkMode } = useTheme(); // 获取 darkMode 状态
+  const { token: { colorBgContainer } } = theme.useToken(); // 获取 colorBgContainer
+
   // 为双栏布局的一级菜单添加 path 属性
   const topLevelMenuItems = menuData.map(item => ({
     key: item.key,
@@ -96,12 +105,12 @@ const TopMenu: React.FC<TopMenuProps> = ({ menuData, layout, onSelectTopMenuItem
 
   return (
     <Menu
-      theme="light"
+      theme={darkMode ? 'dark' : 'light'} // 根据 darkMode 动态设置主题
       mode="horizontal"
       items={layout === 'two-column' ? topLevelMenuItems : allMenuItems}
       onClick={handleMenuClick}
       // defaultSelectedKeys={['home']} // 可以根据当前路由设置默认选中
-      style={{ flex: 1, minWidth: 0 }} // 确保菜单可以水平伸展
+      style={{ flex: 1, minWidth: 0, background: colorBgContainer }} // 使用动态背景色
     />
   );
 };

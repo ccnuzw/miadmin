@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Card, Table, Button, Space, Modal, Form, Input, Select, Tag, Tree, message } from 'antd';
+import { Layout, Card, Table, Button, Space, Modal, Form, Input, Select, Tag, Tree, message, theme } from 'antd'; // 导入 theme
 const { Option } = Select;
 import {
   DeploymentUnitOutlined,
@@ -29,6 +29,7 @@ const OrganizationStructurePage: React.FC = () => {
   const [selectedUsersToAdd, setSelectedUsersToAdd] = useState<string[]>([]); // Stores user IDs to add
   const [form] = Form.useForm();
   const [modalType, setModalType] = useState<'add' | 'edit' | 'add-child-org' | 'add-department' | 'add-sub-department' | ''>('');
+  const { token: { colorBgContainer, colorBgLayout, colorBorder } } = theme.useToken(); // 获取主题 token
 
   // Helper function to find a node by key in the tree data
   const findNodeByKey = (key: string, nodes: OrgTreeNode[]): OrgTreeNode | null => {
@@ -234,8 +235,8 @@ const OrganizationStructurePage: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: '100%', background: '#fff' }}>
-      <Sider width={300} style={{ background: '#fff', borderRight: '1px solid #f0f0f0', padding: 16 }}>
+    <Layout style={{ minHeight: '100%', background: colorBgLayout }}>
+      <Sider width={300} style={{ background: colorBgContainer, borderRight: `1px solid ${colorBorder}`, padding: 16 }}>
         <div style={{ marginBottom: 16 }}>
           <Button type="primary" onClick={handleAddTopLevelOrgUnit} icon={<PlusOutlined />} block>
             新增顶级组织单元
@@ -248,7 +249,7 @@ const OrganizationStructurePage: React.FC = () => {
           onDeleteNode={handleDeleteNode}
         />
       </Sider>
-      <Content style={{ padding: '16px 24px', background: '#fff' }}>
+      <Content style={{ padding: '16px 24px', background: colorBgContainer }}>
         {selectedNode ? (
           <>
             <Card
