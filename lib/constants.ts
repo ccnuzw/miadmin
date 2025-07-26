@@ -28,7 +28,7 @@ export type DepartmentMember = {
 export type MenuItem = {
   key: string;
   label: string;
-  path: string;
+  path?: string; // 将 path 改为可选
   icon?: string;
   children?: MenuItem[];
   hidden?: boolean;
@@ -192,36 +192,36 @@ export const MOCK_ORGANIZATION_MEMBERS: { [orgUnitOrDeptKey: string]: Department
 };
 
 
-// 菜单权限数据 (组织架构菜单，保持不变)
+// 菜单权限数据
 export const MOCK_MENU_PERMISSIONS: MenuItem[] = [
   { key: 'home', label: '首页', path: '/', icon: 'DashboardOutlined' },
   {
     key: 'dashboard_showcase',
     label: '仪表盘展示',
-    path: '/dashboard',
+    // path: '/dashboard', // 移除 path
     icon: 'DashboardOutlined',
     children: [
-      { key: 'new-dashboard', label: '新仪表盘', path: '/new-dashboard' },
-      { key: 'component-showcase', label: '组件展示', path: '/component-showcase' },
-      { key: 'list-showcase', label: '列表展示', path: '/list-showcase' },
+      { key: 'new-dashboard', label: '新仪表盘', path: '/new-dashboard', icon: 'LineChartOutlined' },
+      { key: 'component-showcase', label: '组件展示', path: '/component-showcase', icon: 'AppstoreOutlined' },
+      { key: 'list-showcase', label: '列表展示', path: '/list-showcase', icon: 'TableOutlined' },
     ],
   },
-  { key: 'user_management', label: '用户管理', path: '/users', icon: 'UserOutlined', children: [
-    { key: 'user_list', label: '用户列表', path: '/users' },
+  { key: 'user_management', label: '用户管理', /* path: '/users', */ icon: 'UserOutlined', children: [
+    { key: 'user_list', label: '用户列表', path: '/users', icon: 'UserOutlined' },
     { key: 'user_detail', label: '用户详情', path: '/users/[id]', hidden: true },
     { key: 'user_add', label: '新增用户', path: '/users/new', hidden: true },
-    { key: 'role_list', label: '角色列表', path: '/roles' },
+    { key: 'role_list', label: '角色列表', path: '/roles', icon: 'TeamOutlined' },
     { key: 'role_detail', label: '角色详情', path: '/roles/[id]', hidden: true },
     { key: 'role_add', label: '新增角色', path: '/roles/new', hidden: true },
-    { key: 'permission_management', label: '权限管理', path: '/permissions' },
+    { key: 'permission_management', label: '权限管理', path: '/permissions', icon: 'SafetyOutlined' },
   ]},
-  { key: 'org_management', label: '组织架构', path: '/org/structure', icon: 'DeploymentUnitOutlined', children: [
-    { key: 'org_structure', label: '组织结构管理', path: '/org/structure' },
+  { key: 'org_management', label: '组织架构', /* path: '/org/structure', */ icon: 'DeploymentUnitOutlined', children: [
+    { key: 'org_structure', label: '组织结构管理', path: '/org/structure', icon: 'BlockOutlined' },
   ]},
-  { key: 'system_settings', label: '系统设置', path: '/settings', icon: 'SettingOutlined', children: [
-    { key: 'general_settings', label: '通用设置', path: '/settings' },
-    { key: 'notification_settings', label: '通知设置', path: '/settings/notifications' },
-    { key: 'log_management', label: '日志管理', path: '/settings/logs' },
+  { key: 'system_settings', label: '系统设置', /* path: '/settings', */ icon: 'SettingOutlined', children: [
+    { key: 'general_settings', label: '通用设置', path: '/settings', icon: 'SettingOutlined' },
+    { key: 'notification_settings', label: '通知设置', path: '/settings/notifications', icon: 'NotificationOutlined' },
+    { key: 'log_management', label: '日志管理', path: '/settings/logs', icon: 'FileTextOutlined' },
   ]},
 ];
 

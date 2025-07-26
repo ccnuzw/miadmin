@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Button } from 'antd';
 import {
   UserOutlined,
   SettingOutlined,
@@ -8,17 +8,25 @@ import {
   SafetyOutlined,
   NotificationOutlined,
   FileTextOutlined,
-  DeploymentUnitOutlined, // Import new icon
-  BlockOutlined, // Import new icon
+  DeploymentUnitOutlined,
+  BlockOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  LineChartOutlined,
+  AppstoreOutlined,
+  TableOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
 import { MOCK_MENU_PERMISSIONS, MenuItem } from '@/lib/constants';
+import { LayoutType } from '@/lib/theme-context';
 
 const { Sider } = Layout;
 
 interface SidebarProps {
   collapsed: boolean;
   onCollapse?: (collapsed: boolean) => void;
+  layout: LayoutType;
+  selectedTopMenuKey?: string;
 }
 
 // Map icon names to Ant Design Icon components
@@ -32,6 +40,9 @@ const iconMap: { [key: string]: React.ReactNode } = {
   FileTextOutlined: <FileTextOutlined />,
   DeploymentUnitOutlined: <DeploymentUnitOutlined />,
   BlockOutlined: <BlockOutlined />,
+  LineChartOutlined: <LineChartOutlined />,
+  AppstoreOutlined: <AppstoreOutlined />,
+  TableOutlined: <TableOutlined />,
 };
 
 // Function to transform mock menu data to Ant Design Menu items
@@ -47,26 +58,42 @@ const getMenuItems = (menuData: MenuItem[]) => {
         children: getMenuItems(item.children),
       };
     } else {
+      // 确保 item.path 是一个字符串，即使它是 undefined
+      const linkHref = item.path || '#'; 
       return {
         key: item.key,
         icon: item.icon ? iconMap[item.icon] : null,
-        label: <Link href={item.path}>{item.label}</Link>,
+        label: <Link href={linkHref}>{item.label}</Link>,
       };
     }
   }).filter(Boolean); // Filter out nulls from hidden items
 };
 
-const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
-  const menuItems = getMenuItems(MOCK_MENU_PERMISSIONS);
+const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse, layout, selectedTopMenuKey }) => {
+  let currentMenuItems = MOCK_MENU_PERMISSIONS;
+
+  if (layout === 'two-column' && selectedTopMenuKey) {
+    const selectedTopMenu = MOCK_MENU_PERMISSIONS.find(item => item.key === selectedTopMenuKey);
+    if (selectedTopMenu && selectedTopMenu.children) {
+      currentMenuItems = selectedTopMenu.children;
+    } else {
+      currentMenuItems = [];
+    }
+  }
+
+  const menuItems = getMenuItems(currentMenuItems);
+
+  const siderCollapsed = layout === 'classic' ? collapsed : collapsed; 
+  const siderCollapsible = layout === 'default' || layout === 'two-column' || layout === 'classic'; 
 
   return (
     <Sider
       trigger={null}
-      collapsible
-      collapsed={collapsed}
-      breakpoint="lg" // 当屏幕宽度小于 lg (992px) 时触发响应式
+      collapsible={siderCollapsible}
+      collapsed={siderCollapsed}
+      breakpoint="lg"
       onCollapse={(value) => {
-        if (onCollapse) {
+        if (onCollapse && siderCollapsible) {
           onCollapse(value);
         }
       }}
@@ -74,13 +101,22 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
       collapsedWidth={80}
       style={{ background: '#fff' }}
     >
-      <div className="demo-logo-vertical" style={{ height: 32, margin: 16, background: 'rgba(0,0,0,.02)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {!collapsed && <h1 style={{ color: '#000', fontSize: '18px', margin: 0 }}>MiAdmin</h1>}
+      <div className="demo-logo-vertical" style={{ height: 32, margin: 16, background: 'rgba(0,0,0,.02)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {!siderCollapsed && <h1 style={{ color: '#000', fontSize: '18px', margin: 0 }}>MiAdmin</h1>}
+        {siderCollapsed && <BlockOutlined style={{ fontSize: '24px', color: '#000' }} />}
+        {siderCollapsible && onCollapse && (
+          <Button
+            type="text"
+            icon={siderCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => onCollapse(!siderCollapsed)}
+            style={{ fontSize: '16px', width: 32, height: 32 }}
+          />
+        )}
       </div>
       <Menu
         theme="light"
         mode="inline"
-        defaultSelectedKeys={['dashboard']} // Set default selected key to dashboard
+        defaultSelectedKeys={['dashboard']}
         items={menuItems}
       />
     </Sider>
@@ -88,4 +124,3 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
 };
 
 export default Sidebar;
-

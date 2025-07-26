@@ -1,10 +1,14 @@
+
 import React from 'react';
 import MainLayout from '@/components/Layout/MainLayout';
+import { ThemeProvider } from '@/lib/theme-context';
 
 export default function MainLayoutGroup({ children }: { children: React.ReactNode }) {
   return (
-    <MainLayout>
-      {children}
-    </MainLayout>
+    <ThemeProvider>
+      <MainLayout>
+        {children}
+      </MainLayout>
+    </ThemeProvider>
   );
 }
