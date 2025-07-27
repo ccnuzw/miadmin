@@ -20,15 +20,22 @@ const LoginPage: React.FC = () => {
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
 
-      if (values.username === 'admin' && values.password === '12345') {
-        login('mock_jwt_token');
+      const data = await response.json();
+
+      if (response.ok) {
+        login(data.token);
         message.success('登录成功！');
         router.push('/');
       } else {
-        message.error('用户名或密码错误！');
+        message.error(data.message || '用户名或密码错误！');
       }
     } catch (error) {
       message.error('登录失败，请稍后再试。');

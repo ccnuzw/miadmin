@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Layout, theme, ConfigProvider } from 'antd';
 import Sidebar from './Sidebar';
-import Header from './Header';
+import Header from './Header'; // Re-add Header import
 import ThemeSettings from '@/components/Theme/ThemeSettings';
 import { useTheme, LayoutType } from '@/lib/theme-context';
 import { MOCK_MENU_PERMISSIONS, MenuItem } from '@/lib/constants';
@@ -14,6 +14,7 @@ const { defaultAlgorithm, darkAlgorithm } = theme;
 
 interface MainLayoutProps {
   children: React.ReactNode;
+  selectedKeys: string[]; // 新增 selectedKeys prop
 }
 
 // 辅助函数：查找菜单项的第一个子菜单的路径
@@ -33,7 +34,7 @@ const findFirstChildPath = (menuItem: MenuItem): string | undefined => {
   return undefined;
 };
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children, selectedKeys }) => {
   const [collapsed, setCollapsed] = useState(false);
   const {
     layout,
@@ -130,22 +131,27 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             onCollapse={handleSidebarCollapse}
             layout={layout}
             selectedTopMenuKey={selectedTopMenuKey}
+            selectedKeys={selectedKeys} // Pass selectedKeys to Sidebar
           />
         )}
         <Layout>
-          <Header
-            collapsed={currentSidebarCollapsed}
-            setCollapsed={headerSetCollapsed}
-            layout={layout}
-            onSelectTopMenuItem={handleSelectTopMenuItem}
-          />
+          {layout !== 'classic' && (
+            <Header
+              collapsed={currentSidebarCollapsed}
+              setCollapsed={headerSetCollapsed}
+              layout={layout}
+              onSelectTopMenuItem={handleSelectTopMenuItem}
+            />
+          )}
           <Content
             style={{
-              margin: '24px 16px',
-              padding: 24,
+              margin: layout === 'classic' ? '24px 16px 0' : '0 16px',
+              padding: layout === 'classic' ? 24 : '0 24px',
               minHeight: 280,
-              background: colorBgContainer, 
-              borderRadius: borderRadius, 
+              background: colorBgContainer,
+              borderRadius: borderRadius,
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             {children}
@@ -161,3 +167,4 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 };
 
 export default MainLayout;
+

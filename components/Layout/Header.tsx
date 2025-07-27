@@ -2,9 +2,8 @@
 'use client';
 import React from 'react';
 import { Layout, Button, theme, Dropdown, Space, Avatar } from 'antd';
-import { BellOutlined, UserOutlined, DownOutlined } from '@ant-design/icons'; // 移除 MenuFoldOutlined, MenuUnfoldOutlined
+import { BellOutlined, UserOutlined, DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import BreadcrumbNav from '@/components/BreadcrumbNav';
 import TopMenu from './TopMenu';
 import { LayoutType } from '@/lib/theme-context';
 import { MOCK_MENU_PERMISSIONS } from '@/lib/constants';
@@ -12,8 +11,8 @@ import { MOCK_MENU_PERMISSIONS } from '@/lib/constants';
 const { Header: AntHeader } = Layout;
 
 interface HeaderProps {
-  collapsed: boolean; // 仍然需要这个 prop，因为 TopMenu 可能需要它
-  setCollapsed: (collapsed: boolean) => void; // 仍然需要这个 prop，但不再用于折叠按钮
+  collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
   layout: LayoutType;
   onSelectTopMenuItem?: (key: string) => void;
 }
@@ -52,6 +51,11 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed, layout, onSele
     },
   ];
 
+  // Only render header content if layout is not 'classic'
+  if (layout === 'classic') {
+    return <AntHeader style={{ padding: 0, background: colorBgContainer }} />;
+  }
+
   return (
     <AntHeader style={{ padding: 0, background: colorBgContainer, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -62,7 +66,6 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed, layout, onSele
             onSelectTopMenuItem={onSelectTopMenuItem}
           />
         )}
-        <BreadcrumbNav />
       </div>
       <div style={{ marginRight: 24 }}>
         <Space size="middle">
